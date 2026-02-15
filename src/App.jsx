@@ -1,6 +1,25 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { GAME_DATA, CATEGORY_COLORS, shuffleArray } from './data/gameData'
 
+/* ─── Theme Toggle Icon ─── */
+function ThemeToggle({ theme, onToggle }) {
+  return (
+    <button onClick={onToggle} aria-label="Toggle theme" style={{
+      background: 'none', border: '1px solid var(--border-subtle)',
+      width: 36, height: 36, borderRadius: 10,
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      cursor: 'pointer', fontSize: 17,
+      transition: 'all 0.3s ease',
+      color: 'var(--text-secondary)',
+    }}
+    onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--btn-secondary-border-hover)'}
+    onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border-subtle)'}
+    >
+      {theme === 'dark' ? '☀️' : '🌙'}
+    </button>
+  );
+}
+
 /* ─── Confetti Effect ─── */
 function Confetti({ active }) {
   if (!active) return null;
@@ -25,28 +44,28 @@ function Confetti({ active }) {
 }
 
 /* ─── Navbar ─── */
-function Navbar({ onBack, showBack, rightContent }) {
+function Navbar({ onBack, showBack, rightContent, theme, onThemeToggle }) {
   return (
     <nav style={{
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       padding: '14px 24px',
-      background: 'rgba(7,7,14,0.85)',
+      background: 'var(--bg-nav)',
       backdropFilter: 'blur(20px)',
-      borderBottom: '1px solid rgba(255,255,255,0.04)',
+      borderBottom: '1px solid var(--border-subtle)',
       position: 'sticky', top: 0, zIndex: 50,
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         {showBack && (
           <button onClick={onBack} style={{
-            background: 'none', border: 'none', color: '#6b7084',
+            background: 'none', border: 'none', color: 'var(--text-muted)',
             fontSize: 13, fontWeight: 500, cursor: 'pointer',
             padding: '5px 10px', borderRadius: 6,
             display: 'flex', alignItems: 'center', gap: 4,
             transition: 'color 0.2s',
             fontFamily: 'var(--font-sans)',
           }}
-          onMouseEnter={e => e.currentTarget.style.color = '#a0a4b8'}
-          onMouseLeave={e => e.currentTarget.style.color = '#6b7084'}
+          onMouseEnter={e => e.currentTarget.style.color = 'var(--text-secondary)'}
+          onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}
           >
             <span style={{ fontSize: 16 }}>&larr;</span> Menu
           </button>
@@ -55,14 +74,17 @@ function Navbar({ onBack, showBack, rightContent }) {
           width: 32, height: 32, borderRadius: 8,
           background: 'linear-gradient(135deg, #e53e3e, #c53030)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 17, boxShadow: '0 2px 10px rgba(229,62,62,0.2)',
+          fontSize: 17, boxShadow: 'var(--logo-shadow)',
         }}>🩸</div>
         <div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: '#f0f0f5', letterSpacing: -0.3 }}>Blood Doctor</div>
-          <div style={{ fontSize: 10, color: '#6b7084', fontWeight: 500, letterSpacing: 0.3 }}>Lymphoma Challenge</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: -0.3 }}>Blood Doctor</div>
+          <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 500, letterSpacing: 0.3 }}>Lymphoma Challenge</div>
         </div>
       </div>
-      {rightContent && <div>{rightContent}</div>}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        {rightContent && <div>{rightContent}</div>}
+        <ThemeToggle theme={theme} onToggle={onThemeToggle} />
+      </div>
     </nav>
   );
 }
@@ -70,7 +92,7 @@ function Navbar({ onBack, showBack, rightContent }) {
 /* ─── Progress Bar ─── */
 function ProgressBar({ current, total, color = '#e53e3e' }) {
   return (
-    <div style={{ width: '100%', height: 3, background: 'rgba(255,255,255,0.04)', borderRadius: 2, overflow: 'hidden' }}>
+    <div style={{ width: '100%', height: 3, background: 'var(--progress-track)', borderRadius: 2, overflow: 'hidden' }}>
       <div style={{
         width: `${(current / total) * 100}%`,
         height: '100%',
@@ -85,7 +107,7 @@ function ProgressBar({ current, total, color = '#e53e3e' }) {
 /* ─── Score Display ─── */
 function ScoreDisplay({ correct, total, label = 'Score', compact = false }) {
   const pct = total > 0 ? Math.round((correct / total) * 100) : 0;
-  const color = pct >= 80 ? '#48bb78' : pct >= 60 ? '#ed8936' : total === 0 ? '#6b7084' : '#fc8181';
+  const color = pct >= 80 ? '#48bb78' : pct >= 60 ? '#ed8936' : total === 0 ? 'var(--text-muted)' : '#fc8181';
   if (compact) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -96,8 +118,8 @@ function ScoreDisplay({ correct, total, label = 'Score', compact = false }) {
           fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 12, color,
         }}>{total > 0 ? `${pct}%` : '—'}</div>
         <div>
-          <div style={{ fontSize: 10, color: '#6b7084', letterSpacing: 0.8, textTransform: 'uppercase', fontWeight: 600 }}>{label}</div>
-          <div style={{ fontSize: 14, fontWeight: 700, color: '#f0f0f5' }}>{correct}/{total}</div>
+          <div style={{ fontSize: 10, color: 'var(--text-muted)', letterSpacing: 0.8, textTransform: 'uppercase', fontWeight: 600 }}>{label}</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-score-val)' }}>{correct}/{total}</div>
         </div>
       </div>
     );
@@ -111,8 +133,8 @@ function ScoreDisplay({ correct, total, label = 'Score', compact = false }) {
         fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 16, color,
       }}>{total > 0 ? `${pct}%` : '—'}</div>
       <div>
-        <div style={{ fontSize: 11, color: '#6b7084', letterSpacing: 1, textTransform: 'uppercase', fontWeight: 600 }}>{label}</div>
-        <div style={{ fontSize: 18, fontWeight: 700, color: '#f0f0f5' }}>{correct}/{total}</div>
+        <div style={{ fontSize: 11, color: 'var(--text-muted)', letterSpacing: 1, textTransform: 'uppercase', fontWeight: 600 }}>{label}</div>
+        <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-score-val)' }}>{correct}/{total}</div>
       </div>
     </div>
   );
@@ -167,7 +189,7 @@ function Footer() {
   return (
     <footer style={{
       textAlign: 'center', padding: '32px 24px 20px',
-      borderTop: '1px solid rgba(255,255,255,0.04)',
+      borderTop: '1px solid var(--border-subtle)',
       marginTop: 40,
     }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 6 }}>
@@ -177,17 +199,17 @@ function Footer() {
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: 12,
         }}>🩸</div>
-        <span style={{ fontSize: 13, fontWeight: 700, color: '#a0a4b8' }}>Blood Doctor</span>
+        <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-footer-name)' }}>Blood Doctor</span>
       </div>
-      <div style={{ fontSize: 12, color: '#6b7084', lineHeight: 1.7, maxWidth: 400, margin: '0 auto' }}>
-        <strong style={{ color: '#a0a4b8' }}>Dr Abdul Mannan</strong> &middot; FRCPath &middot; FCPS
+      <div style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.7, maxWidth: 400, margin: '0 auto' }}>
+        <strong style={{ color: 'var(--text-footer-name)' }}>Dr Abdul Mannan</strong> &middot; FRCPath &middot; FCPS
       </div>
-      <div style={{ fontSize: 11, color: '#6b7084', marginTop: 4 }}>
+      <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>
         <a href="mailto:blooddoctor.co@gmail.com" style={{ color: '#e53e3e', textDecoration: 'none', fontWeight: 500 }}>
           blooddoctor.co@gmail.com
         </a>
       </div>
-      <div style={{ fontSize: 10, color: '#4a5068', marginTop: 8 }}>
+      <div style={{ fontSize: 10, color: 'var(--text-dimmed)', marginTop: 8 }}>
         Content sourced from ASH-SAP Chapter 45 &middot; For educational purposes only
       </div>
     </footer>
@@ -216,6 +238,21 @@ export default function App() {
   const [history, setHistory] = useState([]);
   const [showConfetti, setShowConfetti] = useState(false);
   const contentRef = useRef(null);
+
+  // Theme state
+  const [theme, setTheme] = useState(() => {
+    try { return localStorage.getItem('lymphoma-theme') || 'dark'; }
+    catch { return 'dark'; }
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    try { localStorage.setItem('lymphoma-theme', theme); } catch {}
+  }, [theme]);
+
+  const toggleTheme = useCallback(() => {
+    setTheme(t => t === 'dark' ? 'light' : 'dark');
+  }, []);
 
   // Timer
   useEffect(() => {
@@ -318,7 +355,7 @@ export default function App() {
         <div className="app-bg" />
         <div className="grid-overlay" />
         <div className="app-content">
-          <Navbar showBack={false} />
+          <Navbar showBack={false} theme={theme} onThemeToggle={toggleTheme} />
 
           <div style={{ maxWidth: 780, margin: '0 auto', padding: '40px 20px' }}>
             {/* Hero */}
@@ -328,7 +365,7 @@ export default function App() {
                 width: 88, height: 88, borderRadius: 22,
                 background: 'linear-gradient(135deg, #e53e3e 0%, #c53030 100%)',
                 marginBottom: 24, fontSize: 44,
-                boxShadow: '0 8px 40px rgba(229,62,62,0.2)',
+                boxShadow: 'var(--hero-shadow)',
                 animation: 'glow-pulse 3s ease infinite',
               }}>🩸</div>
               <h1 style={{
@@ -338,12 +375,12 @@ export default function App() {
                 letterSpacing: -1,
               }}>Aggressive Lymphoma Challenge</h1>
               <p style={{
-                color: '#a0a4b8', fontSize: 15, margin: '0 0 4px',
+                color: 'var(--text-secondary)', fontSize: 15, margin: '0 0 4px',
                 maxWidth: 480, marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.6,
               }}>
                 FRCPath / FCPS Board Review &mdash; Interactive Case-Based Learning
               </p>
-              <p style={{ color: '#6b7084', fontSize: 12, marginTop: 6, fontStyle: 'italic' }}>
+              <p style={{ color: 'var(--text-muted)', fontSize: 12, marginTop: 6, fontStyle: 'italic' }}>
                 By Dr Abdul Mannan &middot; Blood Doctor Educational Series
               </p>
             </div>
@@ -352,35 +389,35 @@ export default function App() {
             <div style={{ display: 'grid', gap: 16, marginBottom: 24 }}>
               {/* Clinical Scenarios */}
               <button onClick={startScenarios} className="animate-fadeInUp stagger-2" style={{
-                background: 'rgba(255,255,255,0.02)',
-                border: '1px solid rgba(99,179,237,0.1)',
+                background: 'var(--bg-card)',
+                border: '1px solid var(--scenario-card-border-blue)',
                 borderRadius: 16, padding: '28px 28px',
                 cursor: 'pointer', textAlign: 'left',
                 transition: 'all 0.35s cubic-bezier(0.22,1,0.36,1)',
-                boxShadow: '0 2px 16px rgba(0,0,0,0.2)',
+                boxShadow: 'var(--card-shadow)',
                 fontFamily: 'var(--font-sans)',
               }}
               onMouseEnter={e => {
                 e.currentTarget.style.transform = 'translateY(-3px)';
-                e.currentTarget.style.boxShadow = '0 8px 40px rgba(99,179,237,0.08)';
-                e.currentTarget.style.borderColor = 'rgba(99,179,237,0.2)';
+                e.currentTarget.style.boxShadow = 'var(--card-shadow-hover-blue)';
+                e.currentTarget.style.borderColor = 'var(--scenario-card-border-blue-hover)';
               }}
               onMouseLeave={e => {
                 e.currentTarget.style.transform = '';
-                e.currentTarget.style.boxShadow = '0 2px 16px rgba(0,0,0,0.2)';
-                e.currentTarget.style.borderColor = 'rgba(99,179,237,0.1)';
+                e.currentTarget.style.boxShadow = 'var(--card-shadow)';
+                e.currentTarget.style.borderColor = 'var(--scenario-card-border-blue)';
               }}
               >
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: 20 }}>
                   <div style={{
                     width: 52, height: 52, borderRadius: 14, flexShrink: 0,
-                    background: 'rgba(99,179,237,0.08)',
+                    background: 'var(--scenario-icon-blue-bg)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontSize: 26,
                   }}>🏥</div>
                   <div style={{ flex: 1 }}>
-                    <h2 style={{ margin: '0 0 6px', fontSize: 19, fontWeight: 700, color: '#f0f0f5', letterSpacing: -0.3 }}>Clinical Scenarios</h2>
-                    <p style={{ margin: '0 0 14px', color: '#a0a4b8', fontSize: 13, lineHeight: 1.6 }}>
+                    <h2 style={{ margin: '0 0 6px', fontSize: 19, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: -0.3 }}>Clinical Scenarios</h2>
+                    <p style={{ margin: '0 0 14px', color: 'var(--text-secondary)', fontSize: 13, lineHeight: 1.6 }}>
                       8 case-based vignettes with real clinical decisions. Diagnose, classify, and treat patients with aggressive B-cell lymphomas.
                     </p>
                     <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
@@ -389,52 +426,52 @@ export default function App() {
                       ))}
                     </div>
                   </div>
-                  <div style={{ color: '#4a5068', fontSize: 20, flexShrink: 0, alignSelf: 'center' }}>&rarr;</div>
+                  <div style={{ color: 'var(--text-dimmed)', fontSize: 20, flexShrink: 0, alignSelf: 'center' }}>&rarr;</div>
                 </div>
               </button>
 
               {/* Quick-Fire Quiz */}
               <button onClick={startQuickFire} className="animate-fadeInUp stagger-3" style={{
-                background: 'rgba(255,255,255,0.02)',
-                border: '1px solid rgba(246,173,85,0.1)',
+                background: 'var(--bg-card)',
+                border: '1px solid var(--scenario-card-border-orange)',
                 borderRadius: 16, padding: '28px 28px',
                 cursor: 'pointer', textAlign: 'left',
                 transition: 'all 0.35s cubic-bezier(0.22,1,0.36,1)',
-                boxShadow: '0 2px 16px rgba(0,0,0,0.2)',
+                boxShadow: 'var(--card-shadow)',
                 fontFamily: 'var(--font-sans)',
               }}
               onMouseEnter={e => {
                 e.currentTarget.style.transform = 'translateY(-3px)';
-                e.currentTarget.style.boxShadow = '0 8px 40px rgba(246,173,85,0.08)';
-                e.currentTarget.style.borderColor = 'rgba(246,173,85,0.2)';
+                e.currentTarget.style.boxShadow = 'var(--card-shadow-hover-orange)';
+                e.currentTarget.style.borderColor = 'var(--scenario-card-border-orange-hover)';
               }}
               onMouseLeave={e => {
                 e.currentTarget.style.transform = '';
-                e.currentTarget.style.boxShadow = '0 2px 16px rgba(0,0,0,0.2)';
-                e.currentTarget.style.borderColor = 'rgba(246,173,85,0.1)';
+                e.currentTarget.style.boxShadow = 'var(--card-shadow)';
+                e.currentTarget.style.borderColor = 'var(--scenario-card-border-orange)';
               }}
               >
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: 20 }}>
                   <div style={{
                     width: 52, height: 52, borderRadius: 14, flexShrink: 0,
-                    background: 'rgba(246,173,85,0.08)',
+                    background: 'var(--scenario-icon-orange-bg)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontSize: 26,
                   }}>⚡</div>
                   <div style={{ flex: 1 }}>
-                    <h2 style={{ margin: '0 0 6px', fontSize: 19, fontWeight: 700, color: '#f0f0f5', letterSpacing: -0.3 }}>Quick-Fire Quiz</h2>
-                    <p style={{ margin: '0 0 14px', color: '#a0a4b8', fontSize: 13, lineHeight: 1.6 }}>
+                    <h2 style={{ margin: '0 0 6px', fontSize: 19, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: -0.3 }}>Quick-Fire Quiz</h2>
+                    <p style={{ margin: '0 0 14px', color: 'var(--text-secondary)', fontSize: 13, lineHeight: 1.6 }}>
                       10 rapid-fire questions with a 15-second timer. Test your recall on key facts, landmark trials, and classifications.
                     </p>
                     <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
                       <span style={{ color: '#f6ad55', fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
                         <span style={{ fontSize: 14 }}>⏱</span> 15s per question
                       </span>
-                      <span style={{ color: '#4a5068' }}>&middot;</span>
-                      <span style={{ color: '#6b7084', fontSize: 12, fontWeight: 500 }}>10 questions</span>
+                      <span style={{ color: 'var(--text-dimmed)' }}>&middot;</span>
+                      <span style={{ color: 'var(--text-muted)', fontSize: 12, fontWeight: 500 }}>10 questions</span>
                     </div>
                   </div>
-                  <div style={{ color: '#4a5068', fontSize: 20, flexShrink: 0, alignSelf: 'center' }}>&rarr;</div>
+                  <div style={{ color: 'var(--text-dimmed)', fontSize: 20, flexShrink: 0, alignSelf: 'center' }}>&rarr;</div>
                 </div>
               </button>
             </div>
@@ -450,14 +487,14 @@ export default function App() {
                 { num: '8', label: 'NHL Subtypes', icon: '🔬' },
               ].map((s, i) => (
                 <div key={i} style={{
-                  background: 'rgba(255,255,255,0.02)',
-                  border: '1px solid rgba(255,255,255,0.04)',
+                  background: 'var(--stat-card-bg)',
+                  border: '1px solid var(--stat-card-border)',
                   borderRadius: 12, padding: '16px 14px',
                   textAlign: 'center',
                 }}>
                   <div style={{ fontSize: 22, marginBottom: 6 }}>{s.icon}</div>
-                  <div style={{ fontSize: 22, fontWeight: 800, color: '#f0f0f5', fontFamily: 'var(--font-mono)' }}>{s.num}</div>
-                  <div style={{ fontSize: 10, color: '#6b7084', fontWeight: 600, letterSpacing: 0.5, textTransform: 'uppercase', marginTop: 2 }}>{s.label}</div>
+                  <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>{s.num}</div>
+                  <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600, letterSpacing: 0.5, textTransform: 'uppercase', marginTop: 2 }}>{s.label}</div>
                 </div>
               ))}
             </div>
@@ -465,10 +502,10 @@ export default function App() {
             {/* Source disclaimer */}
             <div className="animate-fadeInUp stagger-5" style={{
               padding: '16px 20px', borderRadius: 12,
-              background: 'rgba(255,255,255,0.015)',
-              border: '1px solid rgba(255,255,255,0.03)',
+              background: 'var(--bg-subtle)',
+              border: '1px solid var(--border-subtle)',
             }}>
-              <p style={{ margin: 0, color: '#4a5068', fontSize: 11, textAlign: 'center', lineHeight: 1.7 }}>
+              <p style={{ margin: 0, color: 'var(--text-dimmed)', fontSize: 11, textAlign: 'center', lineHeight: 1.7 }}>
                 Content sourced from ASH-SAP Chapter 45 — Aggressive Non-Hodgkin and Burkitt Lymphomas.
                 Covers DLBCL, PMBCL, Burkitt, DHL, CNS lymphoma, MCL, PTLD, and HIV-associated lymphomas.
               </p>
@@ -491,13 +528,13 @@ export default function App() {
           <div className="grid-overlay" />
           <div className="app-content">
             <Confetti active={showConfetti} />
-            <Navbar showBack onBack={() => setMode('menu')} />
+            <Navbar showBack onBack={() => setMode('menu')} theme={theme} onThemeToggle={toggleTheme} />
             <div style={{ maxWidth: 680, margin: '0 auto', padding: '40px 20px' }}>
               <div className="animate-scaleIn" style={{ textAlign: 'center', marginBottom: 36 }}>
                 <div style={{ fontSize: 64, marginBottom: 16 }}>{passed ? '🎉' : '📚'}</div>
                 <h2 style={{
                   fontSize: 28, fontWeight: 800, margin: '0 0 20px',
-                  color: passed ? '#68d391' : '#f6ad55', letterSpacing: -0.5,
+                  color: passed ? 'var(--correct-text)' : '#f6ad55', letterSpacing: -0.5,
                 }}>{passed ? 'Excellent Performance!' : 'Keep Studying!'}</h2>
                 <div style={{ display: 'inline-block' }}>
                   <ScoreDisplay correct={scenarioScore.correct} total={scenarioScore.total} label="Clinical Scenarios" />
@@ -510,11 +547,11 @@ export default function App() {
                   <div key={i} className={`animate-fadeInUp stagger-${Math.min(i + 1, 8)}`} style={{
                     display: 'flex', alignItems: 'center', gap: 12,
                     padding: '12px 16px', borderRadius: 12,
-                    background: h.correct ? 'rgba(72,187,120,0.04)' : 'rgba(252,129,129,0.04)',
-                    border: `1px solid ${h.correct ? 'rgba(72,187,120,0.1)' : 'rgba(252,129,129,0.1)'}`,
+                    background: h.correct ? 'var(--correct-history-bg)' : 'var(--incorrect-history-bg)',
+                    border: `1px solid ${h.correct ? 'var(--correct-history-border)' : 'var(--incorrect-history-border)'}`,
                   }}>
                     <span style={{ fontSize: 18, flexShrink: 0 }}>{h.correct ? '✅' : '❌'}</span>
-                    <span style={{ flex: 1, fontSize: 13, color: '#e2e8f0', fontWeight: 500 }}>{h.question}</span>
+                    <span style={{ flex: 1, fontSize: 13, color: 'var(--text-vignette)', fontWeight: 500 }}>{h.question}</span>
                     <CategoryBadge category={h.category} />
                   </div>
                 ))}
@@ -532,13 +569,13 @@ export default function App() {
                 onMouseLeave={e => e.currentTarget.style.transform = ''}
                 >Try Again</button>
                 <button onClick={() => setMode('menu')} style={{
-                  padding: '12px 28px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.08)',
-                  cursor: 'pointer', background: 'transparent', color: '#a0a4b8',
+                  padding: '12px 28px', borderRadius: 10, border: '1px solid var(--btn-secondary-border)',
+                  cursor: 'pointer', background: 'transparent', color: 'var(--text-secondary)',
                   fontWeight: 600, fontSize: 14, fontFamily: 'var(--font-sans)',
                   transition: 'all 0.3s',
                 }}
-                onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'}
-                onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'}
+                onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--btn-secondary-border-hover)'}
+                onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--btn-secondary-border)'}
                 >Back to Menu</button>
               </div>
               <Footer />
@@ -560,6 +597,8 @@ export default function App() {
             showBack
             onBack={() => setMode('menu')}
             rightContent={<ScoreDisplay correct={scenarioScore.correct} total={scenarioScore.total} compact />}
+            theme={theme}
+            onThemeToggle={toggleTheme}
           />
           <ProgressBar current={scenarioIdx + 1} total={shuffledScenarios.length} color={catColor.accent} />
 
@@ -568,7 +607,7 @@ export default function App() {
             <div className="animate-fadeIn" style={{
               display: 'flex', gap: 8, alignItems: 'center', marginBottom: 16, flexWrap: 'wrap',
             }}>
-              <span style={{ color: '#6b7084', fontSize: 12, fontWeight: 600, fontFamily: 'var(--font-mono)' }}>
+              <span style={{ color: 'var(--text-muted)', fontSize: 12, fontWeight: 600, fontFamily: 'var(--font-mono)' }}>
                 CASE {scenarioIdx + 1}/{shuffledScenarios.length}
               </span>
               <CategoryBadge category={sc.category} size="lg" />
@@ -577,7 +616,7 @@ export default function App() {
 
             {/* Vignette Card */}
             <div className="animate-fadeInUp" style={{
-              background: 'rgba(255,255,255,0.02)',
+              background: 'var(--bg-card)',
               borderRadius: 16, padding: '24px 26px',
               border: `1px solid ${catColor.accent}15`,
               marginBottom: 20,
@@ -588,13 +627,13 @@ export default function App() {
                 color: catColor.accent, letterSpacing: -0.3,
               }}>{sc.title}</h3>
               <p style={{
-                margin: '0 0 18px', color: '#c4c8d8', fontSize: 14, lineHeight: 1.75,
+                margin: '0 0 18px', color: 'var(--text-vignette)', fontSize: 14, lineHeight: 1.75,
               }}>{sc.vignette}</p>
               <div style={{
-                background: 'rgba(255,255,255,0.03)', borderRadius: 10,
+                background: 'var(--question-bg)', borderRadius: 10,
                 padding: '14px 18px', borderLeft: `3px solid ${catColor.accent}`,
               }}>
-                <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#f0f0f5', lineHeight: 1.65 }}>
+                <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', lineHeight: 1.65 }}>
                   {sc.question}
                 </p>
               </div>
@@ -603,31 +642,31 @@ export default function App() {
             {/* Options */}
             <div style={{ display: 'grid', gap: 10, marginBottom: 20 }}>
               {sc.options.map((opt, idx) => {
-                let bg = 'rgba(255,255,255,0.02)';
-                let border = 'rgba(255,255,255,0.05)';
-                let textColor = '#f0f0f5';
-                let letterBg = 'rgba(255,255,255,0.05)';
-                let letterColor = '#6b7084';
+                let bg = 'var(--bg-option)';
+                let border = 'var(--border-option)';
+                let textColor = 'var(--text-primary)';
+                let letterBg = 'var(--letter-bg)';
+                let letterColor = 'var(--letter-color)';
                 let opacity = 1;
                 let letterContent = String.fromCharCode(65 + idx);
 
                 if (selectedAnswer !== null) {
                   if (opt.correct) {
-                    bg = 'rgba(72,187,120,0.06)';
-                    border = 'rgba(72,187,120,0.3)';
-                    textColor = '#68d391';
-                    letterBg = '#48bb78';
+                    bg = 'var(--correct-bg)';
+                    border = 'var(--correct-border)';
+                    textColor = 'var(--correct-text)';
+                    letterBg = 'var(--correct-letter-bg)';
                     letterColor = '#fff';
                     letterContent = '✓';
                   } else if (idx === selectedAnswer && !opt.correct) {
-                    bg = 'rgba(252,129,129,0.06)';
-                    border = 'rgba(252,129,129,0.3)';
-                    textColor = '#fc8181';
-                    letterBg = '#fc8181';
+                    bg = 'var(--incorrect-bg)';
+                    border = 'var(--incorrect-border)';
+                    textColor = 'var(--incorrect-text)';
+                    letterBg = 'var(--incorrect-letter-bg)';
                     letterColor = '#fff';
                     letterContent = '✗';
                   } else {
-                    opacity = 0.4;
+                    opacity = 'var(--dimmed-opacity)';
                   }
                 }
 
@@ -653,7 +692,7 @@ export default function App() {
                     }}
                     onMouseLeave={e => {
                       if (selectedAnswer === null) {
-                        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)';
+                        e.currentTarget.style.borderColor = 'var(--border-option)';
                         e.currentTarget.style.transform = '';
                       }
                     }}
@@ -676,11 +715,11 @@ export default function App() {
               <div className="animate-fadeInUp" style={{
                 borderRadius: 14, padding: '20px 24px', marginBottom: 16,
                 background: sc.options[selectedAnswer].correct
-                  ? 'rgba(72,187,120,0.04)'
-                  : 'rgba(252,129,129,0.04)',
+                  ? 'var(--correct-panel-bg)'
+                  : 'var(--incorrect-panel-bg)',
                 border: `1px solid ${sc.options[selectedAnswer].correct
-                  ? 'rgba(72,187,120,0.12)'
-                  : 'rgba(252,129,129,0.12)'}`,
+                  ? 'var(--correct-panel-border)'
+                  : 'var(--incorrect-panel-border)'}`,
               }}>
                 <div style={{
                   display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10,
@@ -688,10 +727,10 @@ export default function App() {
                   <span style={{ fontSize: 18 }}>{sc.options[selectedAnswer].correct ? '✅' : '❌'}</span>
                   <span style={{
                     fontWeight: 700, fontSize: 14,
-                    color: sc.options[selectedAnswer].correct ? '#68d391' : '#fc8181',
+                    color: sc.options[selectedAnswer].correct ? 'var(--correct-text)' : 'var(--incorrect-text)',
                   }}>{sc.options[selectedAnswer].correct ? 'Correct!' : 'Incorrect'}</span>
                 </div>
-                <p style={{ margin: 0, color: '#c4c8d8', fontSize: 13, lineHeight: 1.75 }}>
+                <p style={{ margin: 0, color: 'var(--text-vignette)', fontSize: 13, lineHeight: 1.75 }}>
                   {sc.options[selectedAnswer].explanation}
                 </p>
               </div>
@@ -704,28 +743,25 @@ export default function App() {
                   display: 'flex', alignItems: 'center', gap: 10,
                   width: '100%', padding: '14px 18px',
                   borderRadius: showTeaching ? '12px 12px 0 0' : 12,
-                  border: '1px solid rgba(246,173,85,0.12)',
-                  background: 'rgba(246,173,85,0.03)',
+                  border: '1px solid var(--teaching-border)',
+                  background: 'var(--teaching-bg)',
                   cursor: 'pointer', color: '#f6ad55',
                   fontWeight: 600, fontSize: 13,
                   fontFamily: 'var(--font-sans)',
                   transition: 'all 0.2s',
-                }}
-                onMouseEnter={e => e.currentTarget.style.background = 'rgba(246,173,85,0.06)'}
-                onMouseLeave={e => e.currentTarget.style.background = 'rgba(246,173,85,0.03)'}
-                >
+                }}>
                   <span style={{ fontSize: 16 }}>💡</span>
                   <span>{showTeaching ? '▾' : '▸'} Teaching Point</span>
                 </button>
                 {showTeaching && (
                   <div className="animate-fadeIn" style={{
                     padding: '16px 20px',
-                    background: 'rgba(246,173,85,0.025)',
-                    border: '1px solid rgba(246,173,85,0.1)',
+                    background: 'var(--teaching-content-bg)',
+                    border: '1px solid var(--teaching-content-border)',
                     borderTop: 'none',
                     borderRadius: '0 0 12px 12px',
                   }}>
-                    <p style={{ margin: 0, color: '#e2c68f', fontSize: 13, lineHeight: 1.75 }}>{sc.teachingPoint}</p>
+                    <p style={{ margin: 0, color: 'var(--text-teaching)', fontSize: 13, lineHeight: 1.75 }}>{sc.teachingPoint}</p>
                   </div>
                 )}
               </div>
@@ -765,13 +801,13 @@ export default function App() {
           <div className="grid-overlay" />
           <div className="app-content">
             <Confetti active={showConfetti} />
-            <Navbar showBack onBack={() => setMode('menu')} />
+            <Navbar showBack onBack={() => setMode('menu')} theme={theme} onThemeToggle={toggleTheme} />
             <div style={{ maxWidth: 600, margin: '0 auto', padding: '60px 20px', textAlign: 'center' }}>
               <div className="animate-scaleIn">
                 <div style={{ fontSize: 64, marginBottom: 16 }}>{passed ? '🔥' : '⏱'}</div>
                 <h2 style={{
                   fontSize: 28, fontWeight: 800, margin: '0 0 20px',
-                  color: passed ? '#68d391' : '#f6ad55', letterSpacing: -0.5,
+                  color: passed ? 'var(--correct-text)' : '#f6ad55', letterSpacing: -0.5,
                 }}>{passed ? 'Lightning Fast!' : 'Good Attempt!'}</h2>
                 <div style={{ display: 'inline-block' }}>
                   <ScoreDisplay correct={quizScore.correct} total={quizScore.total} label="Quick-Fire Quiz" />
@@ -788,13 +824,13 @@ export default function App() {
                 onMouseLeave={e => e.currentTarget.style.transform = ''}
                 >Try Again</button>
                 <button onClick={() => setMode('menu')} style={{
-                  padding: '12px 28px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.08)',
-                  cursor: 'pointer', background: 'transparent', color: '#a0a4b8',
+                  padding: '12px 28px', borderRadius: 10, border: '1px solid var(--btn-secondary-border)',
+                  cursor: 'pointer', background: 'transparent', color: 'var(--text-secondary)',
                   fontWeight: 600, fontSize: 14, fontFamily: 'var(--font-sans)',
                   transition: 'all 0.3s',
                 }}
-                onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'}
-                onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'}
+                onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--btn-secondary-border-hover)'}
+                onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--btn-secondary-border)'}
                 >Back to Menu</button>
               </div>
               <Footer />
@@ -820,46 +856,48 @@ export default function App() {
                 <ScoreDisplay correct={quizScore.correct} total={quizScore.total} compact />
               </div>
             }
+            theme={theme}
+            onThemeToggle={toggleTheme}
           />
           <ProgressBar current={quizIdx + 1} total={quizQuestions.length} color="#f6ad55" />
 
           <div style={{ maxWidth: 660, margin: '0 auto', padding: '24px 20px' }}>
             <div className="animate-fadeIn" style={{ marginBottom: 20 }}>
-              <span style={{ color: '#6b7084', fontSize: 12, fontWeight: 600, fontFamily: 'var(--font-mono)' }}>
+              <span style={{ color: 'var(--text-muted)', fontSize: 12, fontWeight: 600, fontFamily: 'var(--font-mono)' }}>
                 QUESTION {quizIdx + 1}/{quizQuestions.length}
               </span>
             </div>
 
             <div className="animate-fadeInUp" style={{
-              background: 'rgba(255,255,255,0.02)',
+              background: 'var(--bg-card)',
               borderRadius: 16, padding: '28px 26px 24px',
-              border: '1px solid rgba(255,255,255,0.05)',
+              border: '1px solid var(--border-card)',
               marginBottom: 24,
-              boxShadow: '0 4px 30px rgba(0,0,0,0.2)',
+              boxShadow: 'var(--card-shadow)',
             }}>
-              <h3 style={{ margin: '0 0 24px', fontSize: 17, fontWeight: 700, color: '#f0f0f5', lineHeight: 1.55 }}>
+              <h3 style={{ margin: '0 0 24px', fontSize: 17, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.55 }}>
                 {qq.q}
               </h3>
 
               <div style={{ display: 'grid', gap: 10 }}>
                 {qq.options.map((opt, i) => {
-                  let bg = 'rgba(255,255,255,0.02)';
-                  let border = 'rgba(255,255,255,0.05)';
-                  let textCol = '#f0f0f5';
+                  let bg = 'var(--bg-option)';
+                  let border = 'var(--border-option)';
+                  let textCol = 'var(--text-primary)';
                   let fontW = 400;
 
                   if (quizAnswer !== null) {
                     if (opt === qq.a) {
-                      bg = 'rgba(72,187,120,0.06)';
-                      border = 'rgba(72,187,120,0.3)';
-                      textCol = '#68d391';
+                      bg = 'var(--correct-bg)';
+                      border = 'var(--correct-border)';
+                      textCol = 'var(--correct-text)';
                       fontW = 600;
                     } else if (opt === quizAnswer && opt !== qq.a) {
-                      bg = 'rgba(252,129,129,0.06)';
-                      border = 'rgba(252,129,129,0.3)';
-                      textCol = '#fc8181';
+                      bg = 'var(--incorrect-bg)';
+                      border = 'var(--incorrect-border)';
+                      textCol = 'var(--incorrect-text)';
                     } else {
-                      textCol = '#4a5068';
+                      textCol = 'var(--text-dimmed)';
                     }
                   }
 
@@ -883,7 +921,7 @@ export default function App() {
                       }}
                       onMouseLeave={e => {
                         if (quizAnswer === null) {
-                          e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)';
+                          e.currentTarget.style.borderColor = 'var(--border-option)';
                           e.currentTarget.style.transform = '';
                         }
                       }}
@@ -895,11 +933,11 @@ export default function App() {
               {quizAnswer === '__timeout__' && (
                 <div className="animate-fadeIn" style={{
                   marginTop: 18, padding: '12px 16px', borderRadius: 10,
-                  background: 'rgba(252,129,129,0.04)',
-                  border: '1px solid rgba(252,129,129,0.1)',
+                  background: 'var(--timeout-bg)',
+                  border: '1px solid var(--timeout-border)',
                 }}>
-                  <p style={{ margin: 0, color: '#fc8181', fontWeight: 600, fontSize: 13 }}>
-                    ⏱ Time's up! The answer is: <span style={{ color: '#68d391' }}>{qq.a}</span>
+                  <p style={{ margin: 0, color: 'var(--incorrect-text)', fontWeight: 600, fontSize: 13 }}>
+                    ⏱ Time's up! The answer is: <span style={{ color: 'var(--correct-text)' }}>{qq.a}</span>
                   </p>
                 </div>
               )}
