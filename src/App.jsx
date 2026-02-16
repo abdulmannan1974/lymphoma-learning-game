@@ -1,19 +1,26 @@
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { GAME_DATA, CATEGORY_COLORS, shuffleArray } from './data/gameData'
 
 /* ─── Theme Toggle Icon ─── */
 function ThemeToggle({ theme, onToggle }) {
   return (
     <button onClick={onToggle} aria-label="Toggle theme" style={{
-      background: 'none', border: '1px solid var(--border-subtle)',
-      width: 36, height: 36, borderRadius: 10,
+      background: 'var(--glass-bg)', border: '1px solid var(--border-subtle)',
+      width: 38, height: 38, borderRadius: 12,
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       cursor: 'pointer', fontSize: 17,
       transition: 'all 0.3s ease',
       color: 'var(--text-secondary)',
+      backdropFilter: 'blur(12px)',
     }}
-    onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--btn-secondary-border-hover)'}
-    onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border-subtle)'}
+    onMouseEnter={e => {
+      e.currentTarget.style.borderColor = 'var(--btn-secondary-border-hover)';
+      e.currentTarget.style.transform = 'scale(1.08)';
+    }}
+    onMouseLeave={e => {
+      e.currentTarget.style.borderColor = 'var(--border-subtle)';
+      e.currentTarget.style.transform = 'scale(1)';
+    }}
     >
       {theme === 'dark' ? '☀️' : '🌙'}
     </button>
@@ -23,16 +30,16 @@ function ThemeToggle({ theme, onToggle }) {
 /* ─── Confetti Effect ─── */
 function Confetti({ active }) {
   if (!active) return null;
-  const colors = ['#e53e3e', '#4299e1', '#48bb78', '#f6ad55', '#b794f4', '#fc8181', '#4fd1c5'];
+  const colors = ['#e53e3e', '#4299e1', '#48bb78', '#f6ad55', '#b794f4', '#fc8181', '#4fd1c5', '#f687b3', '#63b3ed', '#68d391'];
   return (
     <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 100, overflow: 'hidden' }}>
-      {Array.from({ length: 40 }).map((_, i) => (
+      {Array.from({ length: 50 }).map((_, i) => (
         <div key={i} style={{
           position: 'absolute',
           left: `${Math.random() * 100}%`,
           top: `-${Math.random() * 10}%`,
-          width: `${6 + Math.random() * 6}px`,
-          height: `${6 + Math.random() * 6}px`,
+          width: `${6 + Math.random() * 8}px`,
+          height: `${6 + Math.random() * 8}px`,
           borderRadius: Math.random() > 0.5 ? '50%' : '2px',
           background: colors[Math.floor(Math.random() * colors.length)],
           animation: `confetti-fall ${2 + Math.random() * 3}s linear ${Math.random() * 2}s forwards`,
@@ -56,136 +63,16 @@ function BrandName({ size = 'sm' }) {
   );
 }
 
-/* ─── Ambient Music Player (Web Audio API) ─── */
-function MusicPlayer() {
-  const [playing, setPlaying] = useState(false);
-  const [vol, setVol] = useState(0.25);
-  const ctxRef = useRef(null);
-  const gainRef = useRef(null);
-  const nodesRef = useRef([]);
-
-  const createAmbient = useCallback(() => {
-    if (ctxRef.current) return;
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    ctxRef.current = ctx;
-    const masterGain = ctx.createGain();
-    masterGain.gain.value = vol;
-    masterGain.connect(ctx.destination);
-    gainRef.current = masterGain;
-
-    // Ambient pad: layered detuned oscillators with slow LFO
-    const notes = [130.81, 164.81, 196.00, 246.94, 293.66]; // C3, E3, G3, B3, D4
-    const nodes = [];
-    notes.forEach((freq, i) => {
-      const osc = ctx.createOscillator();
-      osc.type = 'sine';
-      osc.frequency.value = freq;
-      osc.detune.value = (i - 2) * 3; // slight detuning for warmth
-
-      const oscGain = ctx.createGain();
-      oscGain.gain.value = 0.04;
-
-      // LFO for gentle volume swell
-      const lfo = ctx.createOscillator();
-      lfo.type = 'sine';
-      lfo.frequency.value = 0.08 + i * 0.015; // very slow
-      const lfoGain = ctx.createGain();
-      lfoGain.gain.value = 0.015;
-      lfo.connect(lfoGain);
-      lfoGain.connect(oscGain.gain);
-      lfo.start();
-
-      // Filter for warmth
-      const filter = ctx.createBiquadFilter();
-      filter.type = 'lowpass';
-      filter.frequency.value = 800 + i * 100;
-      filter.Q.value = 0.5;
-
-      osc.connect(filter);
-      filter.connect(oscGain);
-      oscGain.connect(masterGain);
-      osc.start();
-
-      nodes.push(osc, lfo);
-    });
-
-    // Soft noise layer for atmosphere
-    const bufferSize = ctx.sampleRate * 2;
-    const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-    const data = noiseBuffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * 0.008;
-    const noise = ctx.createBufferSource();
-    noise.buffer = noiseBuffer;
-    noise.loop = true;
-    const noiseFilter = ctx.createBiquadFilter();
-    noiseFilter.type = 'lowpass';
-    noiseFilter.frequency.value = 400;
-    noise.connect(noiseFilter);
-    noiseFilter.connect(masterGain);
-    noise.start();
-    nodes.push(noise);
-
-    nodesRef.current = nodes;
-  }, [vol]);
-
-  const toggle = useCallback(() => {
-    if (!playing) {
-      createAmbient();
-      if (ctxRef.current?.state === 'suspended') ctxRef.current.resume();
-      setPlaying(true);
-    } else {
-      ctxRef.current?.suspend();
-      setPlaying(false);
-    }
-  }, [playing, createAmbient]);
-
-  useEffect(() => {
-    if (gainRef.current) gainRef.current.gain.value = vol;
-  }, [vol]);
-
-  useEffect(() => {
-    return () => {
-      nodesRef.current.forEach(n => { try { n.stop(); } catch {} });
-      ctxRef.current?.close();
-    };
-  }, []);
-
+/* ─── Decorative gradient line ─── */
+function GradientDivider({ style = {} }) {
   return (
     <div style={{
-      position: 'fixed', bottom: 16, right: 16, zIndex: 60,
-      display: 'flex', alignItems: 'center', gap: 8,
-      background: 'var(--bg-nav)', backdropFilter: 'blur(20px)',
-      border: '1px solid var(--border-subtle)', borderRadius: 14,
-      padding: '8px 14px', boxShadow: 'var(--card-shadow)',
-      transition: 'all 0.3s ease',
-    }}>
-      <button onClick={toggle} aria-label={playing ? 'Pause music' : 'Play music'} style={{
-        background: 'none', border: 'none', cursor: 'pointer',
-        fontSize: 18, lineHeight: 1, padding: 0,
-        color: playing ? '#e53e3e' : 'var(--text-muted)',
-        transition: 'color 0.3s',
-      }}>
-        {playing ? '🎵' : '🔇'}
-      </button>
-      {playing && (
-        <input type="range" min="0" max="0.5" step="0.01" value={vol}
-          onChange={e => setVol(+e.target.value)}
-          aria-label="Volume"
-          style={{
-            width: 60, height: 3, appearance: 'none', WebkitAppearance: 'none',
-            background: `linear-gradient(to right, #e53e3e ${vol / 0.5 * 100}%, var(--border-subtle) ${vol / 0.5 * 100}%)`,
-            borderRadius: 2, outline: 'none', cursor: 'pointer',
-            accentColor: '#e53e3e',
-          }}
-        />
-      )}
-      <span style={{
-        fontSize: 9, color: 'var(--text-dimmed)', fontWeight: 600,
-        letterSpacing: 0.3, textTransform: 'uppercase',
-      }}>
-        {playing ? 'Ambient' : 'Music'}
-      </span>
-    </div>
+      height: 2,
+      background: 'var(--gradient-hero)',
+      borderRadius: 1,
+      opacity: 0.3,
+      ...style,
+    }} />
   );
 }
 
@@ -196,29 +83,40 @@ function Navbar({ onBack, showBack, rightContent, theme, onThemeToggle }) {
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       padding: '14px 24px',
       background: 'var(--bg-nav)',
-      backdropFilter: 'blur(20px)',
+      backdropFilter: 'var(--nav-blur)',
+      WebkitBackdropFilter: 'var(--nav-blur)',
       borderBottom: '1px solid var(--border-subtle)',
       position: 'sticky', top: 0, zIndex: 50,
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         {showBack && (
           <button onClick={onBack} style={{
-            background: 'none', border: 'none', color: 'var(--text-muted)',
+            background: 'var(--glass-bg)', border: '1px solid var(--border-subtle)',
+            color: 'var(--text-muted)',
             fontSize: 13, fontWeight: 500, cursor: 'pointer',
-            padding: '5px 10px', borderRadius: 6,
-            display: 'flex', alignItems: 'center', gap: 4,
-            transition: 'color 0.2s',
+            padding: '6px 14px', borderRadius: 10,
+            display: 'flex', alignItems: 'center', gap: 5,
+            transition: 'all 0.25s ease',
             fontFamily: 'var(--font-sans)',
+            backdropFilter: 'blur(12px)',
           }}
-          onMouseEnter={e => e.currentTarget.style.color = 'var(--text-secondary)'}
-          onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}
+          onMouseEnter={e => {
+            e.currentTarget.style.color = 'var(--text-primary)';
+            e.currentTarget.style.borderColor = 'var(--btn-secondary-border-hover)';
+            e.currentTarget.style.transform = 'translateX(-2px)';
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.color = 'var(--text-muted)';
+            e.currentTarget.style.borderColor = 'var(--border-subtle)';
+            e.currentTarget.style.transform = '';
+          }}
           >
-            <span style={{ fontSize: 16 }}>&larr;</span> Menu
+            <span style={{ fontSize: 15 }}>&larr;</span> Menu
           </button>
         )}
         <div>
           <BrandName />
-          <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 500, letterSpacing: 0.3 }}>Lymphoma Challenge</div>
+          <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600, letterSpacing: 0.5, textTransform: 'uppercase' }}>Lymphoma Challenge</div>
         </div>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -232,13 +130,14 @@ function Navbar({ onBack, showBack, rightContent, theme, onThemeToggle }) {
 /* ─── Progress Bar ─── */
 function ProgressBar({ current, total, color = '#e53e3e' }) {
   return (
-    <div style={{ width: '100%', height: 3, background: 'var(--progress-track)', borderRadius: 2, overflow: 'hidden' }}>
+    <div style={{ width: '100%', height: 3, background: 'var(--progress-track)', overflow: 'hidden' }}>
       <div style={{
         width: `${(current / total) * 100}%`,
         height: '100%',
-        background: `linear-gradient(90deg, ${color}, ${color}aa)`,
+        background: `linear-gradient(90deg, ${color}, ${color}dd, ${color}88)`,
         borderRadius: 2,
         transition: 'width 0.6s cubic-bezier(0.22,1,0.36,1)',
+        boxShadow: `0 0 12px ${color}40`,
       }} />
     </div>
   );
@@ -252,10 +151,11 @@ function ScoreDisplay({ correct, total, label = 'Score', compact = false }) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <div style={{
-          width: 38, height: 38, borderRadius: '50%',
+          width: 40, height: 40, borderRadius: '50%',
           border: `2.5px solid ${color}`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 12, color,
+          background: `${typeof color === 'string' && color.startsWith('#') ? color + '08' : 'transparent'}`,
         }}>{total > 0 ? `${pct}%` : '—'}</div>
         <div>
           <div style={{ fontSize: 10, color: 'var(--text-muted)', letterSpacing: 0.8, textTransform: 'uppercase', fontWeight: 600 }}>{label}</div>
@@ -267,14 +167,16 @@ function ScoreDisplay({ correct, total, label = 'Score', compact = false }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
       <div style={{
-        width: 56, height: 56, borderRadius: '50%',
+        width: 64, height: 64, borderRadius: '50%',
         border: `3px solid ${color}`,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 16, color,
+        fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 18, color,
+        background: `${typeof color === 'string' && color.startsWith('#') ? color + '0a' : 'transparent'}`,
+        boxShadow: `0 0 24px ${typeof color === 'string' && color.startsWith('#') ? color + '15' : 'transparent'}`,
       }}>{total > 0 ? `${pct}%` : '—'}</div>
       <div>
         <div style={{ fontSize: 11, color: 'var(--text-muted)', letterSpacing: 1, textTransform: 'uppercase', fontWeight: 600 }}>{label}</div>
-        <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-score-val)' }}>{correct}/{total}</div>
+        <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-score-val)' }}>{correct}/{total}</div>
       </div>
     </div>
   );
@@ -283,14 +185,15 @@ function ScoreDisplay({ correct, total, label = 'Score', compact = false }) {
 /* ─── Category Badge ─── */
 function CategoryBadge({ category, size = 'sm' }) {
   const c = CATEGORY_COLORS[category] || { bg: '#4a5568', accent: '#a0aec0' };
-  const pad = size === 'lg' ? '5px 14px' : '3px 10px';
-  const fs = size === 'lg' ? 12 : 10;
+  const pad = size === 'lg' ? '5px 14px' : '4px 11px';
+  const fs = size === 'lg' ? 11 : 10;
   return (
     <span style={{
       display: 'inline-block', padding: pad, borderRadius: 20,
-      background: `${c.accent}10`, color: c.accent, fontSize: fs,
+      background: `${c.accent}14`, color: c.accent, fontSize: fs,
       fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase',
-      border: `1px solid ${c.accent}25`,
+      border: `1px solid ${c.accent}28`,
+      backdropFilter: 'blur(8px)',
     }}>{category}</span>
   );
 }
@@ -301,10 +204,10 @@ function DifficultyBadge({ difficulty }) {
   const color = isAdv ? '#f6ad55' : '#68d391';
   return (
     <span style={{
-      display: 'inline-block', padding: '3px 10px', borderRadius: 20,
-      background: `${color}10`, color, fontSize: 10,
+      display: 'inline-block', padding: '4px 11px', borderRadius: 20,
+      background: `${color}14`, color, fontSize: 10,
       fontWeight: 600, letterSpacing: 0.5,
-      border: `1px solid ${color}20`,
+      border: `1px solid ${color}25`,
     }}>{difficulty}</span>
   );
 }
@@ -314,12 +217,14 @@ function TimerRing({ timeLeft }) {
   const color = timeLeft > 10 ? '#48bb78' : timeLeft > 5 ? '#ed8936' : '#fc8181';
   return (
     <div style={{
-      width: 44, height: 44, borderRadius: '50%',
+      width: 46, height: 46, borderRadius: '50%',
       border: `3px solid ${color}`,
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: 17, color,
       animation: timeLeft <= 5 ? 'timer-pulse 0.5s ease infinite' : 'none',
       transition: 'border-color 0.3s, color 0.3s',
+      background: `${color}0a`,
+      boxShadow: timeLeft <= 5 ? `0 0 20px ${color}25` : 'none',
     }}>{timeLeft}</div>
   );
 }
@@ -328,10 +233,11 @@ function TimerRing({ timeLeft }) {
 function Footer() {
   return (
     <footer style={{
-      textAlign: 'center', padding: '32px 24px 20px',
+      textAlign: 'center', padding: '36px 24px 24px',
       borderTop: '1px solid var(--border-subtle)',
-      marginTop: 40,
+      marginTop: 48,
     }}>
+      <GradientDivider style={{ maxWidth: 120, margin: '0 auto 20px', opacity: 0.2 }} />
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0, marginBottom: 6 }}>
         <BrandName size="md" />
       </div>
@@ -339,11 +245,17 @@ function Footer() {
         <strong style={{ color: 'var(--text-footer-name)' }}>Dr Abdul Mannan</strong> &middot; FRCPath &middot; FCPS
       </div>
       <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>
-        <a href="mailto:blooddoctor.co@gmail.com" style={{ color: '#e53e3e', textDecoration: 'none', fontWeight: 500 }}>
+        <a href="mailto:blooddoctor.co@gmail.com" style={{
+          color: '#e53e3e', textDecoration: 'none', fontWeight: 500,
+          transition: 'opacity 0.2s',
+        }}
+        onMouseEnter={e => e.currentTarget.style.opacity = '0.8'}
+        onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+        >
           blooddoctor.co@gmail.com
         </a>
       </div>
-      <div style={{ fontSize: 10, color: 'var(--text-dimmed)', marginTop: 8 }}>
+      <div style={{ fontSize: 10, color: 'var(--text-dimmed)', marginTop: 10 }}>
         For educational purposes only
       </div>
     </footer>
@@ -482,57 +394,76 @@ export default function App() {
     setTimerActive(true);
   };
 
+  /* Stat card config for colourful stats */
+  const statCards = [
+    { num: '20', label: 'Clinical Cases', icon: '📋', gradient: 'var(--stat-gradient-1)', border: 'var(--stat-border-1)', numColor: 'var(--stat-num-1)', iconBg: 'var(--stat-icon-1)' },
+    { num: '40+', label: 'Quiz Questions', icon: '🧠', gradient: 'var(--stat-gradient-2)', border: 'var(--stat-border-2)', numColor: 'var(--stat-num-2)', iconBg: 'var(--stat-icon-2)' },
+    { num: '11', label: 'NHL Subtypes', icon: '🔬', gradient: 'var(--stat-gradient-3)', border: 'var(--stat-border-3)', numColor: 'var(--stat-num-3)', iconBg: 'var(--stat-icon-3)' },
+  ];
+
   /* ─── MENU ─── */
   if (mode === 'menu') {
     return (
       <>
         <div className="app-bg" />
+        <div className="app-bg-extra" />
         <div className="grid-overlay" />
         <div className="app-content">
           <Navbar showBack={false} theme={theme} onThemeToggle={toggleTheme} />
-          <MusicPlayer />
 
-          <div style={{ maxWidth: 780, margin: '0 auto', padding: '40px 20px' }}>
+          <div style={{ maxWidth: 780, margin: '0 auto', padding: '44px 20px' }}>
             {/* Hero */}
-            <div className="animate-fadeInUp" style={{ textAlign: 'center', marginBottom: 56 }}>
-              <div style={{ marginBottom: 20 }}>
-                <span style={{ fontSize: 'clamp(32px, 6vw, 48px)', fontWeight: 900, letterSpacing: -0.5 }}>
+            <div className="animate-fadeInUp" style={{ textAlign: 'center', marginBottom: 60 }}>
+              <div style={{ marginBottom: 22 }}>
+                <span style={{ fontSize: 'clamp(34px, 6vw, 52px)', fontWeight: 900, letterSpacing: -0.5 }}>
                   <span style={{ color: 'var(--text-primary)' }}>Blood</span>
-                  <span style={{ color: '#e53e3e', fontSize: 'clamp(30px, 5.5vw, 44px)', verticalAlign: 'middle', filter: 'drop-shadow(0 2px 8px rgba(229,62,62,0.3))' }}>🩸</span>
+                  <span style={{
+                    color: '#e53e3e',
+                    fontSize: 'clamp(30px, 5.5vw, 46px)',
+                    verticalAlign: 'middle',
+                    filter: 'drop-shadow(0 3px 12px rgba(229,62,62,0.35))',
+                  }}>🩸</span>
                   <span style={{ color: 'var(--text-primary)' }}>Doctor</span>
                 </span>
               </div>
               <h1 style={{
-                fontSize: 'clamp(28px, 5vw, 40px)', fontWeight: 900, margin: '0 0 10px',
-                background: 'linear-gradient(135deg, #fc8181 0%, #f6ad55 40%, #68d391 100%)',
+                fontSize: 'clamp(28px, 5vw, 42px)', fontWeight: 900, margin: '0 0 12px',
+                background: 'var(--gradient-hero)',
+                backgroundSize: '200% auto',
+                animation: 'gradient-shift 6s ease infinite',
                 WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
                 letterSpacing: -1,
               }}>Aggressive Lymphoma Challenge</h1>
               <p style={{
                 color: 'var(--text-secondary)', fontSize: 15, margin: '0 0 4px',
-                maxWidth: 480, marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.6,
+                maxWidth: 500, marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.65,
               }}>
                 FRCPath / FCPS Board Review &mdash; Interactive Case-Based Learning
               </p>
-              <p style={{ color: 'var(--text-muted)', fontSize: 12, marginTop: 6, fontStyle: 'italic' }}>
+              <p style={{ color: 'var(--text-muted)', fontSize: 12, marginTop: 8, fontStyle: 'italic' }}>
                 By Dr Abdul Mannan
               </p>
+              <GradientDivider style={{ maxWidth: 200, margin: '24px auto 0' }} />
             </div>
 
             {/* Mode Cards */}
-            <div style={{ display: 'grid', gap: 16, marginBottom: 24 }}>
+            <div style={{ display: 'grid', gap: 18, marginBottom: 28 }}>
               {/* Clinical Scenarios */}
               <button onClick={startScenarios} className="animate-fadeInUp stagger-2" style={{
                 background: 'var(--bg-card)',
                 border: '1px solid var(--scenario-card-border-blue)',
-                borderRadius: 16, padding: '28px 28px',
+                borderRadius: 20, padding: '30px 30px',
                 cursor: 'pointer', textAlign: 'left',
-                transition: 'all 0.35s cubic-bezier(0.22,1,0.36,1)',
+                transition: 'all 0.4s cubic-bezier(0.22,1,0.36,1)',
                 boxShadow: 'var(--card-shadow)',
                 fontFamily: 'var(--font-sans)',
+                backdropFilter: 'blur(16px)',
+                WebkitBackdropFilter: 'blur(16px)',
+                position: 'relative',
+                overflow: 'hidden',
               }}
               onMouseEnter={e => {
-                e.currentTarget.style.transform = 'translateY(-3px)';
+                e.currentTarget.style.transform = 'translateY(-4px) scale(1.01)';
                 e.currentTarget.style.boxShadow = 'var(--card-shadow-hover-blue)';
                 e.currentTarget.style.borderColor = 'var(--scenario-card-border-blue-hover)';
               }}
@@ -544,14 +475,15 @@ export default function App() {
               >
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: 20 }}>
                   <div style={{
-                    width: 52, height: 52, borderRadius: 14, flexShrink: 0,
+                    width: 56, height: 56, borderRadius: 16, flexShrink: 0,
                     background: 'var(--scenario-icon-blue-bg)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 26,
+                    fontSize: 28,
+                    border: '1px solid rgba(99,179,237,0.1)',
                   }}>🏥</div>
                   <div style={{ flex: 1 }}>
-                    <h2 style={{ margin: '0 0 6px', fontSize: 19, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: -0.3 }}>Clinical Scenarios</h2>
-                    <p style={{ margin: '0 0 14px', color: 'var(--text-secondary)', fontSize: 13, lineHeight: 1.6 }}>
+                    <h2 style={{ margin: '0 0 8px', fontSize: 20, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: -0.3 }}>Clinical Scenarios</h2>
+                    <p style={{ margin: '0 0 16px', color: 'var(--text-secondary)', fontSize: 13, lineHeight: 1.65 }}>
                       20 case-based vignettes with real clinical decisions. Diagnose, classify, and treat patients with aggressive B-cell lymphomas.
                     </p>
                     <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
@@ -560,7 +492,10 @@ export default function App() {
                       ))}
                     </div>
                   </div>
-                  <div style={{ color: 'var(--text-dimmed)', fontSize: 20, flexShrink: 0, alignSelf: 'center' }}>&rarr;</div>
+                  <div style={{
+                    color: 'var(--text-dimmed)', fontSize: 22, flexShrink: 0, alignSelf: 'center',
+                    transition: 'transform 0.3s, color 0.3s',
+                  }}>&rarr;</div>
                 </div>
               </button>
 
@@ -568,14 +503,18 @@ export default function App() {
               <button onClick={startQuickFire} className="animate-fadeInUp stagger-3" style={{
                 background: 'var(--bg-card)',
                 border: '1px solid var(--scenario-card-border-orange)',
-                borderRadius: 16, padding: '28px 28px',
+                borderRadius: 20, padding: '30px 30px',
                 cursor: 'pointer', textAlign: 'left',
-                transition: 'all 0.35s cubic-bezier(0.22,1,0.36,1)',
+                transition: 'all 0.4s cubic-bezier(0.22,1,0.36,1)',
                 boxShadow: 'var(--card-shadow)',
                 fontFamily: 'var(--font-sans)',
+                backdropFilter: 'blur(16px)',
+                WebkitBackdropFilter: 'blur(16px)',
+                position: 'relative',
+                overflow: 'hidden',
               }}
               onMouseEnter={e => {
-                e.currentTarget.style.transform = 'translateY(-3px)';
+                e.currentTarget.style.transform = 'translateY(-4px) scale(1.01)';
                 e.currentTarget.style.boxShadow = 'var(--card-shadow-hover-orange)';
                 e.currentTarget.style.borderColor = 'var(--scenario-card-border-orange-hover)';
               }}
@@ -587,48 +526,69 @@ export default function App() {
               >
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: 20 }}>
                   <div style={{
-                    width: 52, height: 52, borderRadius: 14, flexShrink: 0,
+                    width: 56, height: 56, borderRadius: 16, flexShrink: 0,
                     background: 'var(--scenario-icon-orange-bg)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 26,
+                    fontSize: 28,
+                    border: '1px solid rgba(246,173,85,0.1)',
                   }}>⚡</div>
                   <div style={{ flex: 1 }}>
-                    <h2 style={{ margin: '0 0 6px', fontSize: 19, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: -0.3 }}>Quick-Fire Quiz</h2>
-                    <p style={{ margin: '0 0 14px', color: 'var(--text-secondary)', fontSize: 13, lineHeight: 1.6 }}>
+                    <h2 style={{ margin: '0 0 8px', fontSize: 20, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: -0.3 }}>Quick-Fire Quiz</h2>
+                    <p style={{ margin: '0 0 16px', color: 'var(--text-secondary)', fontSize: 13, lineHeight: 1.65 }}>
                       15 rapid-fire questions from a pool of 40+ with a 15-second timer. Test your recall on key facts, landmark trials, and classifications.
                     </p>
-                    <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                      <span style={{ color: '#f6ad55', fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                      <span style={{
+                        color: '#f6ad55', fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5,
+                        background: 'rgba(246,173,85,0.08)', padding: '4px 10px', borderRadius: 8,
+                        border: '1px solid rgba(246,173,85,0.12)',
+                      }}>
                         <span style={{ fontSize: 14 }}>⏱</span> 15s per question
                       </span>
                       <span style={{ color: 'var(--text-dimmed)' }}>&middot;</span>
                       <span style={{ color: 'var(--text-muted)', fontSize: 12, fontWeight: 500 }}>15 questions</span>
                     </div>
                   </div>
-                  <div style={{ color: 'var(--text-dimmed)', fontSize: 20, flexShrink: 0, alignSelf: 'center' }}>&rarr;</div>
+                  <div style={{
+                    color: 'var(--text-dimmed)', fontSize: 22, flexShrink: 0, alignSelf: 'center',
+                    transition: 'transform 0.3s, color 0.3s',
+                  }}>&rarr;</div>
                 </div>
               </button>
             </div>
 
-            {/* Stats overview */}
+            {/* Stats overview — colourful */}
             <div className="animate-fadeInUp stagger-4" style={{
-              display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12,
-              marginBottom: 20,
+              display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14,
+              marginBottom: 24,
             }}>
-              {[
-                { num: '20', label: 'Clinical Cases', icon: '📋' },
-                { num: '40+', label: 'Quiz Questions', icon: '🧠' },
-                { num: '11', label: 'NHL Subtypes', icon: '🔬' },
-              ].map((s, i) => (
+              {statCards.map((s, i) => (
                 <div key={i} style={{
-                  background: 'var(--stat-card-bg)',
-                  border: '1px solid var(--stat-card-border)',
-                  borderRadius: 12, padding: '16px 14px',
+                  background: s.gradient,
+                  border: `1px solid ${s.border}`,
+                  borderRadius: 16, padding: '20px 16px',
                   textAlign: 'center',
-                }}>
-                  <div style={{ fontSize: 22, marginBottom: 6 }}>{s.icon}</div>
-                  <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>{s.num}</div>
-                  <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600, letterSpacing: 0.5, textTransform: 'uppercase', marginTop: 2 }}>{s.label}</div>
+                  backdropFilter: 'blur(12px)',
+                  transition: 'all 0.3s ease',
+                }}
+                onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
+                onMouseLeave={e => e.currentTarget.style.transform = ''}
+                >
+                  <div style={{
+                    fontSize: 24, marginBottom: 8,
+                    width: 44, height: 44, borderRadius: 12,
+                    background: s.iconBg,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    margin: '0 auto 10px',
+                  }}>{s.icon}</div>
+                  <div style={{
+                    fontSize: 24, fontWeight: 800, color: s.numColor,
+                    fontFamily: 'var(--font-mono)',
+                  }}>{s.num}</div>
+                  <div style={{
+                    fontSize: 10, color: 'var(--text-muted)', fontWeight: 600,
+                    letterSpacing: 0.6, textTransform: 'uppercase', marginTop: 4,
+                  }}>{s.label}</div>
                 </div>
               ))}
             </div>
@@ -647,33 +607,43 @@ export default function App() {
       return (
         <>
           <div className="app-bg" />
+          <div className="app-bg-extra" />
           <div className="grid-overlay" />
           <div className="app-content">
             <Confetti active={showConfetti} />
             <Navbar showBack onBack={() => setMode('menu')} theme={theme} onThemeToggle={toggleTheme} />
-            <MusicPlayer />
-            <div style={{ maxWidth: 680, margin: '0 auto', padding: '40px 20px' }}>
-              <div className="animate-scaleIn" style={{ textAlign: 'center', marginBottom: 36 }}>
-                <div style={{ fontSize: 64, marginBottom: 16 }}>{passed ? '🎉' : '📚'}</div>
+            <div style={{ maxWidth: 680, margin: '0 auto', padding: '48px 20px' }}>
+              <div className="animate-scaleIn" style={{ textAlign: 'center', marginBottom: 40 }}>
+                <div style={{ fontSize: 72, marginBottom: 18 }}>{passed ? '🎉' : '📚'}</div>
                 <h2 style={{
-                  fontSize: 28, fontWeight: 800, margin: '0 0 20px',
-                  color: passed ? 'var(--correct-text)' : '#f6ad55', letterSpacing: -0.5,
+                  fontSize: 30, fontWeight: 900, margin: '0 0 8px',
+                  background: passed
+                    ? 'linear-gradient(135deg, #48bb78, #68d391)'
+                    : 'linear-gradient(135deg, #f6ad55, #ed8936)',
+                  WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+                  letterSpacing: -0.5,
                 }}>{passed ? 'Excellent Performance!' : 'Keep Studying!'}</h2>
+                <GradientDivider style={{ maxWidth: 100, margin: '16px auto 24px' }} />
                 <div style={{ display: 'inline-block' }}>
                   <ScoreDisplay correct={scenarioScore.correct} total={scenarioScore.total} label="Clinical Scenarios" />
                 </div>
               </div>
 
               {/* History */}
-              <div style={{ display: 'grid', gap: 8, marginBottom: 32 }}>
+              <div style={{ display: 'grid', gap: 10, marginBottom: 36 }}>
                 {history.map((h, i) => (
                   <div key={i} className={`animate-fadeInUp stagger-${Math.min(i + 1, 8)}`} style={{
                     display: 'flex', alignItems: 'center', gap: 12,
-                    padding: '12px 16px', borderRadius: 12,
+                    padding: '14px 18px', borderRadius: 14,
                     background: h.correct ? 'var(--correct-history-bg)' : 'var(--incorrect-history-bg)',
                     border: `1px solid ${h.correct ? 'var(--correct-history-border)' : 'var(--incorrect-history-border)'}`,
-                  }}>
-                    <span style={{ fontSize: 18, flexShrink: 0 }}>{h.correct ? '✅' : '❌'}</span>
+                    backdropFilter: 'blur(8px)',
+                    transition: 'transform 0.2s',
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.transform = 'translateX(4px)'}
+                  onMouseLeave={e => e.currentTarget.style.transform = ''}
+                  >
+                    <span style={{ fontSize: 20, flexShrink: 0 }}>{h.correct ? '✅' : '❌'}</span>
                     <span style={{ flex: 1, fontSize: 13, color: 'var(--text-vignette)', fontWeight: 500 }}>{h.question}</span>
                     <CategoryBadge category={h.category} />
                   </div>
@@ -682,23 +652,30 @@ export default function App() {
 
               <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
                 <button onClick={startScenarios} style={{
-                  padding: '12px 28px', borderRadius: 10, border: 'none', cursor: 'pointer',
-                  background: 'linear-gradient(135deg, #e53e3e, #c53030)', color: '#fff',
+                  padding: '13px 32px', borderRadius: 12, border: 'none', cursor: 'pointer',
+                  background: 'var(--gradient-primary)', color: '#fff',
                   fontWeight: 700, fontSize: 14, fontFamily: 'var(--font-sans)',
-                  boxShadow: '0 2px 16px rgba(229,62,62,0.25)',
+                  boxShadow: '0 4px 20px rgba(229,62,62,0.3)',
                   transition: 'all 0.3s',
                 }}
-                onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-1px)'}
+                onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
                 onMouseLeave={e => e.currentTarget.style.transform = ''}
                 >Try Again</button>
                 <button onClick={() => setMode('menu')} style={{
-                  padding: '12px 28px', borderRadius: 10, border: '1px solid var(--btn-secondary-border)',
-                  cursor: 'pointer', background: 'transparent', color: 'var(--text-secondary)',
+                  padding: '13px 32px', borderRadius: 12, border: '1px solid var(--btn-secondary-border)',
+                  cursor: 'pointer', background: 'var(--glass-bg)', color: 'var(--text-secondary)',
                   fontWeight: 600, fontSize: 14, fontFamily: 'var(--font-sans)',
+                  backdropFilter: 'blur(12px)',
                   transition: 'all 0.3s',
                 }}
-                onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--btn-secondary-border-hover)'}
-                onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--btn-secondary-border)'}
+                onMouseEnter={e => {
+                  e.currentTarget.style.borderColor = 'var(--btn-secondary-border-hover)';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.borderColor = 'var(--btn-secondary-border)';
+                  e.currentTarget.style.transform = '';
+                }}
                 >Back to Menu</button>
               </div>
               <Footer />
@@ -714,6 +691,7 @@ export default function App() {
     return (
       <>
         <div className="app-bg" />
+        <div className="app-bg-extra" />
         <div className="grid-overlay" />
         <div className="app-content">
           <Navbar
@@ -723,15 +701,18 @@ export default function App() {
             theme={theme}
             onThemeToggle={toggleTheme}
           />
-          <MusicPlayer />
           <ProgressBar current={scenarioIdx + 1} total={shuffledScenarios.length} color={catColor.accent} />
 
-          <div style={{ maxWidth: 780, margin: '0 auto', padding: '20px 20px' }} ref={contentRef}>
+          <div style={{ maxWidth: 780, margin: '0 auto', padding: '24px 20px' }} ref={contentRef}>
             {/* Case header */}
             <div className="animate-fadeIn" style={{
-              display: 'flex', gap: 8, alignItems: 'center', marginBottom: 16, flexWrap: 'wrap',
+              display: 'flex', gap: 8, alignItems: 'center', marginBottom: 18, flexWrap: 'wrap',
             }}>
-              <span style={{ color: 'var(--text-muted)', fontSize: 12, fontWeight: 600, fontFamily: 'var(--font-mono)' }}>
+              <span style={{
+                color: 'var(--text-muted)', fontSize: 12, fontWeight: 700, fontFamily: 'var(--font-mono)',
+                background: 'var(--glass-bg)', padding: '4px 10px', borderRadius: 8,
+                border: '1px solid var(--border-subtle)',
+              }}>
                 CASE {scenarioIdx + 1}/{shuffledScenarios.length}
               </span>
               <CategoryBadge category={sc.category} size="lg" />
@@ -741,30 +722,34 @@ export default function App() {
             {/* Vignette Card */}
             <div className="animate-fadeInUp" style={{
               background: 'var(--bg-card)',
-              borderRadius: 16, padding: '24px 26px',
-              border: `1px solid ${catColor.accent}15`,
-              marginBottom: 20,
-              boxShadow: `0 4px 30px ${catColor.glow}`,
+              borderRadius: 20, padding: '28px 28px',
+              border: `1px solid ${catColor.accent}18`,
+              marginBottom: 22,
+              boxShadow: `0 4px 36px ${catColor.glow}`,
+              backdropFilter: 'blur(16px)',
+              WebkitBackdropFilter: 'blur(16px)',
             }}>
               <h3 style={{
-                margin: '0 0 14px', fontSize: 20, fontWeight: 700,
+                margin: '0 0 16px', fontSize: 21, fontWeight: 800,
                 color: catColor.accent, letterSpacing: -0.3,
               }}>{sc.title}</h3>
               <p style={{
-                margin: '0 0 18px', color: 'var(--text-vignette)', fontSize: 14, lineHeight: 1.75,
+                margin: '0 0 20px', color: 'var(--text-vignette)', fontSize: 14, lineHeight: 1.8,
               }}>{sc.vignette}</p>
               <div style={{
-                background: 'var(--question-bg)', borderRadius: 10,
-                padding: '14px 18px', borderLeft: `3px solid ${catColor.accent}`,
+                background: 'var(--question-bg)', borderRadius: 12,
+                padding: '16px 20px',
+                borderLeft: `4px solid ${catColor.accent}`,
+                backdropFilter: 'blur(8px)',
               }}>
-                <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', lineHeight: 1.65 }}>
+                <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', lineHeight: 1.7 }}>
                   {sc.question}
                 </p>
               </div>
             </div>
 
             {/* Options */}
-            <div style={{ display: 'grid', gap: 10, marginBottom: 20 }}>
+            <div style={{ display: 'grid', gap: 10, marginBottom: 22 }}>
               {sc.options.map((opt, idx) => {
                 let bg = 'var(--bg-option)';
                 let border = 'var(--border-option)';
@@ -800,33 +785,36 @@ export default function App() {
                     className={`animate-fadeInUp stagger-${idx + 1}`}
                     style={{
                       display: 'flex', alignItems: 'flex-start', gap: 14,
-                      width: '100%', padding: '16px 18px', borderRadius: 12,
+                      width: '100%', padding: '16px 20px', borderRadius: 14,
                       border: `1.5px solid ${border}`, background: bg,
                       cursor: selectedAnswer !== null ? 'default' : 'pointer',
-                      textAlign: 'left', color: textColor, fontSize: 14, lineHeight: 1.6,
-                      transition: 'all 0.25s ease',
+                      textAlign: 'left', color: textColor, fontSize: 14, lineHeight: 1.65,
+                      transition: 'all 0.3s cubic-bezier(0.22,1,0.36,1)',
                       fontWeight: selectedAnswer !== null && opt.correct ? 600 : 400,
                       opacity, fontFamily: 'var(--font-sans)',
+                      backdropFilter: 'blur(8px)',
                     }}
                     onMouseEnter={e => {
                       if (selectedAnswer === null) {
-                        e.currentTarget.style.borderColor = `${catColor.accent}40`;
-                        e.currentTarget.style.transform = 'translateX(4px)';
+                        e.currentTarget.style.borderColor = `${catColor.accent}45`;
+                        e.currentTarget.style.transform = 'translateX(6px)';
+                        e.currentTarget.style.boxShadow = `0 4px 20px ${catColor.glow}`;
                       }
                     }}
                     onMouseLeave={e => {
                       if (selectedAnswer === null) {
                         e.currentTarget.style.borderColor = 'var(--border-option)';
                         e.currentTarget.style.transform = '';
+                        e.currentTarget.style.boxShadow = 'none';
                       }
                     }}
                   >
                     <span style={{
                       display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                      width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
+                      width: 30, height: 30, borderRadius: '50%', flexShrink: 0,
                       background: letterBg, color: letterColor,
                       fontSize: 12, fontWeight: 700, fontFamily: 'var(--font-mono)',
-                      transition: 'all 0.25s',
+                      transition: 'all 0.3s',
                     }}>{letterContent}</span>
                     <span>{opt.text}</span>
                   </button>
@@ -837,24 +825,25 @@ export default function App() {
             {/* Explanation */}
             {showExplanation && selectedAnswer !== null && (
               <div className="animate-fadeInUp" style={{
-                borderRadius: 14, padding: '20px 24px', marginBottom: 16,
+                borderRadius: 16, padding: '22px 26px', marginBottom: 18,
                 background: sc.options[selectedAnswer].correct
                   ? 'var(--correct-panel-bg)'
                   : 'var(--incorrect-panel-bg)',
                 border: `1px solid ${sc.options[selectedAnswer].correct
                   ? 'var(--correct-panel-border)'
                   : 'var(--incorrect-panel-border)'}`,
+                backdropFilter: 'blur(12px)',
               }}>
                 <div style={{
-                  display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10,
+                  display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12,
                 }}>
-                  <span style={{ fontSize: 18 }}>{sc.options[selectedAnswer].correct ? '✅' : '❌'}</span>
+                  <span style={{ fontSize: 20 }}>{sc.options[selectedAnswer].correct ? '✅' : '❌'}</span>
                   <span style={{
-                    fontWeight: 700, fontSize: 14,
+                    fontWeight: 800, fontSize: 15,
                     color: sc.options[selectedAnswer].correct ? 'var(--correct-text)' : 'var(--incorrect-text)',
                   }}>{sc.options[selectedAnswer].correct ? 'Correct!' : 'Incorrect'}</span>
                 </div>
-                <p style={{ margin: 0, color: 'var(--text-vignette)', fontSize: 13, lineHeight: 1.75 }}>
+                <p style={{ margin: 0, color: 'var(--text-vignette)', fontSize: 13, lineHeight: 1.8 }}>
                   {sc.options[selectedAnswer].explanation}
                 </p>
               </div>
@@ -862,30 +851,32 @@ export default function App() {
 
             {/* Teaching Point */}
             {showExplanation && (
-              <div className="animate-fadeInUp" style={{ marginBottom: 24 }}>
+              <div className="animate-fadeInUp" style={{ marginBottom: 28 }}>
                 <button onClick={() => setShowTeaching(!showTeaching)} style={{
                   display: 'flex', alignItems: 'center', gap: 10,
-                  width: '100%', padding: '14px 18px',
-                  borderRadius: showTeaching ? '12px 12px 0 0' : 12,
+                  width: '100%', padding: '15px 20px',
+                  borderRadius: showTeaching ? '14px 14px 0 0' : 14,
                   border: '1px solid var(--teaching-border)',
                   background: 'var(--teaching-bg)',
                   cursor: 'pointer', color: '#f6ad55',
-                  fontWeight: 600, fontSize: 13,
+                  fontWeight: 700, fontSize: 13,
                   fontFamily: 'var(--font-sans)',
-                  transition: 'all 0.2s',
+                  transition: 'all 0.25s',
+                  backdropFilter: 'blur(8px)',
                 }}>
-                  <span style={{ fontSize: 16 }}>💡</span>
+                  <span style={{ fontSize: 17 }}>💡</span>
                   <span>{showTeaching ? '▾' : '▸'} Teaching Point</span>
                 </button>
                 {showTeaching && (
                   <div className="animate-fadeIn" style={{
-                    padding: '16px 20px',
+                    padding: '18px 22px',
                     background: 'var(--teaching-content-bg)',
                     border: '1px solid var(--teaching-content-border)',
                     borderTop: 'none',
-                    borderRadius: '0 0 12px 12px',
+                    borderRadius: '0 0 14px 14px',
+                    backdropFilter: 'blur(8px)',
                   }}>
-                    <p style={{ margin: 0, color: 'var(--text-teaching)', fontSize: 13, lineHeight: 1.75 }}>{sc.teachingPoint}</p>
+                    <p style={{ margin: 0, color: 'var(--text-teaching)', fontSize: 13, lineHeight: 1.8 }}>{sc.teachingPoint}</p>
                   </div>
                 )}
               </div>
@@ -893,17 +884,24 @@ export default function App() {
 
             {/* Next Button */}
             {showExplanation && (
-              <div className="animate-fadeInUp" style={{ textAlign: 'center', marginBottom: 24 }}>
+              <div className="animate-fadeInUp" style={{ textAlign: 'center', marginBottom: 28 }}>
                 <button onClick={nextScenario} style={{
-                  padding: '13px 36px', borderRadius: 10, border: 'none', cursor: 'pointer',
+                  padding: '14px 40px', borderRadius: 12, border: 'none', cursor: 'pointer',
                   background: `linear-gradient(135deg, ${catColor.accent}, ${catColor.bg})`,
                   color: '#fff', fontWeight: 700, fontSize: 14,
-                  boxShadow: `0 4px 20px ${catColor.glow}`,
+                  boxShadow: `0 4px 24px ${catColor.glow}`,
                   fontFamily: 'var(--font-sans)',
                   transition: 'all 0.3s',
+                  letterSpacing: 0.2,
                 }}
-                onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-1px)'}
-                onMouseLeave={e => e.currentTarget.style.transform = ''}
+                onMouseEnter={e => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = `0 8px 32px ${catColor.glow}`;
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.transform = '';
+                  e.currentTarget.style.boxShadow = `0 4px 24px ${catColor.glow}`;
+                }}
                 >
                   {scenarioIdx + 1 >= shuffledScenarios.length ? 'View Results' : 'Next Case →'}
                 </button>
@@ -922,40 +920,53 @@ export default function App() {
       return (
         <>
           <div className="app-bg" />
+          <div className="app-bg-extra" />
           <div className="grid-overlay" />
           <div className="app-content">
             <Confetti active={showConfetti} />
             <Navbar showBack onBack={() => setMode('menu')} theme={theme} onThemeToggle={toggleTheme} />
-            <MusicPlayer />
             <div style={{ maxWidth: 600, margin: '0 auto', padding: '60px 20px', textAlign: 'center' }}>
               <div className="animate-scaleIn">
-                <div style={{ fontSize: 64, marginBottom: 16 }}>{passed ? '🔥' : '⏱'}</div>
+                <div style={{ fontSize: 72, marginBottom: 18 }}>{passed ? '🔥' : '⏱'}</div>
                 <h2 style={{
-                  fontSize: 28, fontWeight: 800, margin: '0 0 20px',
-                  color: passed ? 'var(--correct-text)' : '#f6ad55', letterSpacing: -0.5,
+                  fontSize: 30, fontWeight: 900, margin: '0 0 8px',
+                  background: passed
+                    ? 'linear-gradient(135deg, #f6ad55, #ed8936, #e53e3e)'
+                    : 'linear-gradient(135deg, #f6ad55, #ed8936)',
+                  WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+                  letterSpacing: -0.5,
                 }}>{passed ? 'Lightning Fast!' : 'Good Attempt!'}</h2>
+                <GradientDivider style={{ maxWidth: 100, margin: '16px auto 24px' }} />
                 <div style={{ display: 'inline-block' }}>
                   <ScoreDisplay correct={quizScore.correct} total={quizScore.total} label="Quick-Fire Quiz" />
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginTop: 36 }}>
+              <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginTop: 40 }}>
                 <button onClick={startQuickFire} style={{
-                  padding: '12px 28px', borderRadius: 10, border: 'none', cursor: 'pointer',
-                  background: 'linear-gradient(135deg, #f6ad55, #ed8936)', color: '#1a202c',
+                  padding: '13px 32px', borderRadius: 12, border: 'none', cursor: 'pointer',
+                  background: 'var(--gradient-orange)', color: '#1a202c',
                   fontWeight: 700, fontSize: 14, fontFamily: 'var(--font-sans)',
+                  boxShadow: '0 4px 20px rgba(246,173,85,0.3)',
                   transition: 'all 0.3s',
                 }}
-                onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-1px)'}
+                onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
                 onMouseLeave={e => e.currentTarget.style.transform = ''}
                 >Try Again</button>
                 <button onClick={() => setMode('menu')} style={{
-                  padding: '12px 28px', borderRadius: 10, border: '1px solid var(--btn-secondary-border)',
-                  cursor: 'pointer', background: 'transparent', color: 'var(--text-secondary)',
+                  padding: '13px 32px', borderRadius: 12, border: '1px solid var(--btn-secondary-border)',
+                  cursor: 'pointer', background: 'var(--glass-bg)', color: 'var(--text-secondary)',
                   fontWeight: 600, fontSize: 14, fontFamily: 'var(--font-sans)',
+                  backdropFilter: 'blur(12px)',
                   transition: 'all 0.3s',
                 }}
-                onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--btn-secondary-border-hover)'}
-                onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--btn-secondary-border)'}
+                onMouseEnter={e => {
+                  e.currentTarget.style.borderColor = 'var(--btn-secondary-border-hover)';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.borderColor = 'var(--btn-secondary-border)';
+                  e.currentTarget.style.transform = '';
+                }}
                 >Back to Menu</button>
               </div>
               <Footer />
@@ -970,6 +981,7 @@ export default function App() {
     return (
       <>
         <div className="app-bg" />
+        <div className="app-bg-extra" />
         <div className="grid-overlay" />
         <div className="app-content">
           <Navbar
@@ -984,24 +996,29 @@ export default function App() {
             theme={theme}
             onThemeToggle={toggleTheme}
           />
-          <MusicPlayer />
           <ProgressBar current={quizIdx + 1} total={quizQuestions.length} color="#f6ad55" />
 
-          <div style={{ maxWidth: 660, margin: '0 auto', padding: '24px 20px' }}>
-            <div className="animate-fadeIn" style={{ marginBottom: 20 }}>
-              <span style={{ color: 'var(--text-muted)', fontSize: 12, fontWeight: 600, fontFamily: 'var(--font-mono)' }}>
+          <div style={{ maxWidth: 660, margin: '0 auto', padding: '28px 20px' }}>
+            <div className="animate-fadeIn" style={{ marginBottom: 22 }}>
+              <span style={{
+                color: 'var(--text-muted)', fontSize: 12, fontWeight: 700, fontFamily: 'var(--font-mono)',
+                background: 'var(--glass-bg)', padding: '4px 10px', borderRadius: 8,
+                border: '1px solid var(--border-subtle)',
+              }}>
                 QUESTION {quizIdx + 1}/{quizQuestions.length}
               </span>
             </div>
 
             <div className="animate-fadeInUp" style={{
               background: 'var(--bg-card)',
-              borderRadius: 16, padding: '28px 26px 24px',
+              borderRadius: 20, padding: '30px 28px 26px',
               border: '1px solid var(--border-card)',
-              marginBottom: 24,
+              marginBottom: 26,
               boxShadow: 'var(--card-shadow)',
+              backdropFilter: 'blur(16px)',
+              WebkitBackdropFilter: 'blur(16px)',
             }}>
-              <h3 style={{ margin: '0 0 24px', fontSize: 17, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.55 }}>
+              <h3 style={{ margin: '0 0 26px', fontSize: 17, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.6 }}>
                 {qq.q}
               </h3>
 
@@ -1032,23 +1049,27 @@ export default function App() {
                       disabled={quizAnswer !== null}
                       className={`animate-fadeInUp stagger-${i + 1}`}
                       style={{
-                        padding: '13px 18px', borderRadius: 10,
+                        padding: '14px 20px', borderRadius: 12,
                         border: `1.5px solid ${border}`, background: bg,
                         cursor: quizAnswer !== null ? 'default' : 'pointer',
                         textAlign: 'left', color: textCol, fontSize: 14,
-                        transition: 'all 0.25s', fontWeight: fontW,
+                        transition: 'all 0.3s cubic-bezier(0.22,1,0.36,1)',
+                        fontWeight: fontW,
                         fontFamily: 'var(--font-sans)',
+                        backdropFilter: 'blur(8px)',
                       }}
                       onMouseEnter={e => {
                         if (quizAnswer === null) {
-                          e.currentTarget.style.borderColor = 'rgba(246,173,85,0.3)';
-                          e.currentTarget.style.transform = 'translateX(4px)';
+                          e.currentTarget.style.borderColor = 'rgba(246,173,85,0.35)';
+                          e.currentTarget.style.transform = 'translateX(6px)';
+                          e.currentTarget.style.boxShadow = '0 4px 20px rgba(246,173,85,0.1)';
                         }
                       }}
                       onMouseLeave={e => {
                         if (quizAnswer === null) {
                           e.currentTarget.style.borderColor = 'var(--border-option)';
                           e.currentTarget.style.transform = '';
+                          e.currentTarget.style.boxShadow = 'none';
                         }
                       }}
                     >{opt}</button>
@@ -1058,9 +1079,10 @@ export default function App() {
 
               {quizAnswer === '__timeout__' && (
                 <div className="animate-fadeIn" style={{
-                  marginTop: 18, padding: '12px 16px', borderRadius: 10,
+                  marginTop: 20, padding: '14px 18px', borderRadius: 12,
                   background: 'var(--timeout-bg)',
                   border: '1px solid var(--timeout-border)',
+                  backdropFilter: 'blur(8px)',
                 }}>
                   <p style={{ margin: 0, color: 'var(--incorrect-text)', fontWeight: 600, fontSize: 13 }}>
                     ⏱ Time's up! The answer is: <span style={{ color: 'var(--correct-text)' }}>{qq.a}</span>
@@ -1072,13 +1094,21 @@ export default function App() {
             {quizAnswer !== null && (
               <div className="animate-fadeInUp" style={{ textAlign: 'center' }}>
                 <button onClick={nextQuiz} style={{
-                  padding: '13px 36px', borderRadius: 10, border: 'none', cursor: 'pointer',
-                  background: 'linear-gradient(135deg, #f6ad55, #ed8936)', color: '#1a202c',
+                  padding: '14px 40px', borderRadius: 12, border: 'none', cursor: 'pointer',
+                  background: 'var(--gradient-orange)', color: '#1a202c',
                   fontWeight: 700, fontSize: 14, fontFamily: 'var(--font-sans)',
+                  boxShadow: '0 4px 20px rgba(246,173,85,0.3)',
                   transition: 'all 0.3s',
+                  letterSpacing: 0.2,
                 }}
-                onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-1px)'}
-                onMouseLeave={e => e.currentTarget.style.transform = ''}
+                onMouseEnter={e => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 8px 32px rgba(246,173,85,0.35)';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.transform = '';
+                  e.currentTarget.style.boxShadow = '0 4px 20px rgba(246,173,85,0.3)';
+                }}
                 >
                   {quizIdx + 1 >= quizQuestions.length ? 'View Results' : 'Next →'}
                 </button>
