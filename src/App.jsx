@@ -1,6 +1,315 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { GAME_DATA, CATEGORY_COLORS, shuffleArray } from './data/gameData'
 
+/* ═══════════════════════════════════════════════════════════════
+   SVG CELL ILLUSTRATIONS
+   ═══════════════════════════════════════════════════════════════ */
+
+function DLBCLCells() {
+  return (
+    <svg viewBox="0 0 64 64" width="64" height="64">
+      <circle cx="20" cy="22" r="14" fill="#63b3ed" opacity="0.3" />
+      <circle cx="20" cy="22" r="10" fill="#4299e1" opacity="0.5" />
+      <circle cx="18" cy="20" r="5" fill="#2b6cb0" />
+      <circle cx="44" cy="38" r="12" fill="#63b3ed" opacity="0.3" />
+      <circle cx="44" cy="38" r="8" fill="#4299e1" opacity="0.5" />
+      <circle cx="42" cy="36" r="4" fill="#2b6cb0" />
+    </svg>
+  );
+}
+
+function BurkittCells() {
+  return (
+    <svg viewBox="0 0 64 64" width="64" height="64">
+      <circle cx="16" cy="16" r="7" fill="#2d3748" />
+      <circle cx="32" cy="12" r="6" fill="#2d3748" />
+      <circle cx="48" cy="18" r="7" fill="#2d3748" />
+      <circle cx="12" cy="36" r="6" fill="#2d3748" />
+      <circle cx="52" cy="42" r="6" fill="#2d3748" />
+      <circle cx="18" cy="52" r="7" fill="#2d3748" />
+      <circle cx="44" cy="52" r="6" fill="#2d3748" />
+      <circle cx="24" cy="28" r="9" fill="#f6ad55" opacity="0.7" />
+      <circle cx="40" cy="32" r="8" fill="#f6ad55" opacity="0.7" />
+      <circle cx="32" cy="44" r="9" fill="#f6ad55" opacity="0.7" />
+    </svg>
+  );
+}
+
+function MCLCells() {
+  return (
+    <svg viewBox="0 0 64 64" width="64" height="64">
+      <ellipse cx="18" cy="20" rx="6" ry="8" fill="#38b2ac" opacity="0.4" />
+      <ellipse cx="18" cy="20" rx="4" ry="6" fill="#319795" />
+      <path d="M 16 20 Q 18 18, 20 20" stroke="#2c7a7b" strokeWidth="1.5" fill="none" />
+      <ellipse cx="42" cy="24" rx="5" ry="7" fill="#38b2ac" opacity="0.4" />
+      <ellipse cx="42" cy="24" rx="3.5" ry="5" fill="#319795" />
+      <path d="M 40 24 Q 42 22, 44 24" stroke="#2c7a7b" strokeWidth="1.5" fill="none" />
+      <ellipse cx="28" cy="44" rx="6" ry="8" fill="#38b2ac" opacity="0.4" />
+      <ellipse cx="28" cy="44" rx="4" ry="6" fill="#319795" />
+      <path d="M 26 44 Q 28 42, 30 44" stroke="#2c7a7b" strokeWidth="1.5" fill="none" />
+      <ellipse cx="48" cy="48" rx="5" ry="7" fill="#38b2ac" opacity="0.4" />
+      <ellipse cx="48" cy="48" rx="3.5" ry="5" fill="#319795" />
+      <path d="M 46 48 Q 48 46, 50 48" stroke="#2c7a7b" strokeWidth="1.5" fill="none" />
+    </svg>
+  );
+}
+
+function PMBCLCells() {
+  return (
+    <svg viewBox="0 0 64 64" width="64" height="64">
+      <circle cx="18" cy="20" r="9" fill="#b794f4" opacity="0.4" />
+      <circle cx="18" cy="20" r="6" fill="#9f7aea" />
+      <rect x="10" y="18" width="16" height="2" fill="#fff" opacity="0.8" />
+      <circle cx="44" cy="22" r="8" fill="#b794f4" opacity="0.4" />
+      <circle cx="44" cy="22" r="5" fill="#9f7aea" />
+      <rect x="37" y="20" width="14" height="2" fill="#fff" opacity="0.8" />
+      <circle cx="28" cy="44" r="10" fill="#b794f4" opacity="0.4" />
+      <circle cx="28" cy="44" r="7" fill="#9f7aea" />
+      <rect x="19" y="42" width="18" height="2.5" fill="#fff" opacity="0.8" />
+      <rect x="15" y="38" width="10" height="1.5" fill="#fff" opacity="0.6" />
+    </svg>
+  );
+}
+
+function CNSLymphomaCells() {
+  return (
+    <svg viewBox="0 0 64 64" width="64" height="64">
+      <ellipse cx="32" cy="32" rx="28" ry="24" fill="#e2e8f0" opacity="0.3" />
+      <ellipse cx="32" cy="32" rx="22" ry="18" fill="#cbd5e0" opacity="0.4" />
+      <circle cx="32" cy="32" r="10" fill="#4299e1" opacity="0.6" />
+      <circle cx="32" cy="32" r="14" fill="none" stroke="#fc8181" strokeWidth="2" opacity="0.7" />
+      <circle cx="32" cy="32" r="17" fill="none" stroke="#f6ad55" strokeWidth="1.5" opacity="0.5" />
+    </svg>
+  );
+}
+
+function DHLCells() {
+  return (
+    <svg viewBox="0 0 64 64" width="64" height="64">
+      <circle cx="20" cy="22" r="11" fill="#e53e3e" opacity="0.3" />
+      <circle cx="20" cy="22" r="8" fill="#c53030" />
+      <text x="14" y="26" fontSize="8" fontWeight="bold" fill="#fff">MYC</text>
+      <circle cx="44" cy="24" r="10" fill="#805ad5" opacity="0.3" />
+      <circle cx="44" cy="24" r="7" fill="#6b46c1" />
+      <text x="36" y="27" fontSize="7" fontWeight="bold" fill="#fff">BCL2</text>
+      <circle cx="30" cy="44" r="11" fill="#e53e3e" opacity="0.3" />
+      <circle cx="30" cy="44" r="8" fill="#c53030" />
+      <text x="24" y="48" fontSize="8" fontWeight="bold" fill="#fff">MYC</text>
+      <circle cx="50" cy="48" r="9" fill="#805ad5" opacity="0.3" />
+      <circle cx="50" cy="48" r="6" fill="#6b46c1" />
+      <text x="43" y="51" fontSize="6" fontWeight="bold" fill="#fff">BCL2</text>
+    </svg>
+  );
+}
+
+function PTLDCells() {
+  return (
+    <svg viewBox="0 0 64 64" width="64" height="64">
+      <circle cx="18" cy="20" r="10" fill="#48bb78" opacity="0.3" />
+      <circle cx="18" cy="20" r="7" fill="#38a169" />
+      <circle cx="16" cy="18" r="2" fill="#68d391" />
+      <text x="13" y="24" fontSize="6" fontWeight="bold" fill="#fff">EBV</text>
+      <circle cx="44" cy="22" r="9" fill="#48bb78" opacity="0.3" />
+      <circle cx="44" cy="22" r="6" fill="#38a169" />
+      <circle cx="42" cy="20" r="1.5" fill="#68d391" />
+      <text x="39" y="25" fontSize="5" fontWeight="bold" fill="#fff">EBV</text>
+      <circle cx="28" cy="44" r="11" fill="#48bb78" opacity="0.3" />
+      <circle cx="28" cy="44" r="8" fill="#38a169" />
+      <circle cx="26" cy="42" r="2.5" fill="#68d391" />
+      <text x="22" y="48" fontSize="6" fontWeight="bold" fill="#fff">EBV</text>
+    </svg>
+  );
+}
+
+function HIVLymphomaCells() {
+  return (
+    <svg viewBox="0 0 64 64" width="64" height="64">
+      <circle cx="20" cy="22" r="10" fill="#f687b3" opacity="0.3" />
+      <circle cx="20" cy="22" r="7" fill="#ed64a6" />
+      <circle cx="18" cy="20" r="2" fill="#d53f8c" />
+      <circle cx="22" cy="24" r="1.5" fill="#d53f8c" />
+      <circle cx="42" cy="26" r="9" fill="#f687b3" opacity="0.3" />
+      <circle cx="42" cy="26" r="6" fill="#ed64a6" />
+      <circle cx="40" cy="24" r="1.5" fill="#d53f8c" />
+      <circle cx="44" cy="28" r="1" fill="#d53f8c" />
+      <circle cx="30" cy="46" r="11" fill="#f687b3" opacity="0.3" />
+      <circle cx="30" cy="46" r="8" fill="#ed64a6" />
+      <circle cx="28" cy="44" r="2" fill="#d53f8c" />
+      <circle cx="32" cy="48" r="1.5" fill="#d53f8c" />
+    </svg>
+  );
+}
+
+function MGZLCells() {
+  return (
+    <svg viewBox="0 0 64 64" width="64" height="64">
+      <defs>
+        <linearGradient id="greyZone1" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#9f7aea" />
+          <stop offset="50%" stopColor="#718096" />
+          <stop offset="100%" stopColor="#4299e1" />
+        </linearGradient>
+        <linearGradient id="greyZone2" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#4299e1" />
+          <stop offset="50%" stopColor="#718096" />
+          <stop offset="100%" stopColor="#9f7aea" />
+        </linearGradient>
+      </defs>
+      <circle cx="20" cy="22" r="10" fill="url(#greyZone1)" opacity="0.8" />
+      <circle cx="44" cy="24" r="9" fill="url(#greyZone2)" opacity="0.8" />
+      <circle cx="30" cy="44" r="11" fill="url(#greyZone1)" opacity="0.8" />
+      <circle cx="50" cy="48" r="8" fill="url(#greyZone2)" opacity="0.8" />
+    </svg>
+  );
+}
+
+function THRLBCLCells() {
+  return (
+    <svg viewBox="0 0 64 64" width="64" height="64">
+      <circle cx="12" cy="14" r="4" fill="#fc8181" opacity="0.5" />
+      <circle cx="24" cy="12" r="3" fill="#fc8181" opacity="0.5" />
+      <circle cx="18" cy="24" r="3.5" fill="#fc8181" opacity="0.5" />
+      <circle cx="10" cy="32" r="3" fill="#fc8181" opacity="0.5" />
+      <circle cx="40" cy="16" r="3.5" fill="#fc8181" opacity="0.5" />
+      <circle cx="52" cy="20" r="3" fill="#fc8181" opacity="0.5" />
+      <circle cx="46" cy="30" r="3" fill="#fc8181" opacity="0.5" />
+      <circle cx="14" cy="48" r="3.5" fill="#fc8181" opacity="0.5" />
+      <circle cx="26" cy="52" r="3" fill="#fc8181" opacity="0.5" />
+      <circle cx="50" cy="50" r="3" fill="#fc8181" opacity="0.5" />
+      <circle cx="30" cy="28" r="12" fill="#4299e1" opacity="0.4" />
+      <circle cx="30" cy="28" r="9" fill="#3182ce" />
+      <circle cx="28" cy="26" r="4" fill="#2c5282" />
+    </svg>
+  );
+}
+
+function RRDLBCLCells() {
+  return (
+    <svg viewBox="0 0 64 64" width="64" height="64">
+      <circle cx="20" cy="22" r="11" fill="#4299e1" opacity="0.3" />
+      <circle cx="20" cy="22" r="8" fill="#3182ce" />
+      <path d="M 14 22 L 26 22 M 20 16 L 20 28" stroke="#e53e3e" strokeWidth="3" opacity="0.8" />
+      <circle cx="44" cy="26" r="10" fill="#4299e1" opacity="0.3" />
+      <circle cx="44" cy="26" r="7" fill="#3182ce" />
+      <path d="M 38 26 L 50 26 M 44 20 L 44 32" stroke="#e53e3e" strokeWidth="2.5" opacity="0.8" />
+      <circle cx="30" cy="46" r="12" fill="#4299e1" opacity="0.3" />
+      <circle cx="30" cy="46" r="9" fill="#3182ce" />
+      <path d="M 23 46 L 37 46 M 30 39 L 30 53" stroke="#e53e3e" strokeWidth="3" opacity="0.8" />
+    </svg>
+  );
+}
+
+const LYMPHOMA_SVG = {
+  'DLBCL': DLBCLCells,
+  'Burkitt': BurkittCells,
+  'MCL': MCLCells,
+  'PMBCL': PMBCLCells,
+  'CNS Lymphoma': CNSLymphomaCells,
+  'DHL': DHLCells,
+  'PTLD': PTLDCells,
+  'HIV Lymphoma': HIVLymphomaCells,
+  'MGZL': MGZLCells,
+  'T/HRLBCL': THRLBCLCells,
+  'R/R DLBCL': RRDLBCLCells,
+};
+
+/* ═══════════════════════════════════════════════════════════════
+   GAMIFICATION UTILITIES
+   ═══════════════════════════════════════════════════════════════ */
+
+const ACHIEVEMENTS = [
+  { id: 'first_blood', name: 'First Blood', icon: '🩸', description: 'Answer first question correctly' },
+  { id: 'perfect_round', name: 'Perfect Round', icon: '⭐', description: 'Get all quick-fire questions right' },
+  { id: 'lymphoma_expert', name: 'Lymphoma Expert', icon: '🏆', description: 'Score 80%+ on scenarios' },
+  { id: 'speed_demon', name: 'Speed Demon', icon: '⚡', description: 'Answer 5 quick-fire in <5 seconds each' },
+  { id: 'scholar', name: 'Scholar', icon: '📚', description: 'Complete 50 total questions' },
+  { id: 'master_diagnostician', name: 'Master Diagnostician', icon: '👑', description: 'Score 100% on scenarios' },
+];
+
+function getXP() {
+  try {
+    return parseInt(localStorage.getItem('lymphoma-xp') || '0', 10);
+  } catch {
+    return 0;
+  }
+}
+
+function setXP(xp) {
+  try {
+    localStorage.setItem('lymphoma-xp', String(xp));
+  } catch {}
+}
+
+function getAchievements() {
+  try {
+    return JSON.parse(localStorage.getItem('lymphoma-achievements') || '[]');
+  } catch {
+    return [];
+  }
+}
+
+function setAchievements(achievements) {
+  try {
+    localStorage.setItem('lymphoma-achievements', JSON.stringify(achievements));
+  } catch {}
+}
+
+function getLevel(xp) {
+  return Math.floor(xp / 500) + 1;
+}
+
+function getXPForNextLevel(xp) {
+  const level = getLevel(xp);
+  return level * 500;
+}
+
+/* ─── Achievement Toast ─── */
+function AchievementToast({ achievement, onClose }) {
+  useEffect(() => {
+    const timer = setTimeout(onClose, 4000);
+    return () => clearTimeout(timer);
+  }, [onClose]);
+
+  return (
+    <div className="animate-slideInRight" style={{
+      position: 'fixed',
+      top: 100,
+      right: 20,
+      zIndex: 200,
+      background: 'linear-gradient(135deg, #f6ad55, #ed8936)',
+      borderRadius: 16,
+      padding: '16px 20px',
+      boxShadow: '0 8px 32px rgba(246,173,85,0.4)',
+      display: 'flex',
+      alignItems: 'center',
+      gap: 12,
+      minWidth: 280,
+      border: '1px solid rgba(246,173,85,0.3)',
+      backdropFilter: 'blur(12px)',
+    }}>
+      <div style={{ fontSize: 32 }}>{achievement.icon}</div>
+      <div style={{ flex: 1 }}>
+        <div style={{ fontWeight: 800, fontSize: 14, color: '#1a202c', marginBottom: 2 }}>Achievement Unlocked!</div>
+        <div style={{ fontSize: 12, color: '#2d3748', fontWeight: 600 }}>{achievement.name}</div>
+      </div>
+      <button onClick={onClose} style={{
+        background: 'rgba(26,32,44,0.1)',
+        border: 'none',
+        borderRadius: 8,
+        width: 24,
+        height: 24,
+        cursor: 'pointer',
+        fontSize: 12,
+        color: '#1a202c',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontWeight: 700,
+      }}>×</button>
+    </div>
+  );
+}
+
 /* ─── Theme Toggle Icon ─── */
 function ThemeToggle({ theme, onToggle }) {
   return (
@@ -76,8 +385,57 @@ function GradientDivider({ style = {} }) {
   );
 }
 
+/* ─── XP Bar in Navbar ─── */
+function XPBar({ xp }) {
+  const level = getLevel(xp);
+  const nextLevelXP = getXPForNextLevel(xp);
+  const currentLevelXP = (level - 1) * 500;
+  const progress = ((xp - currentLevelXP) / (nextLevelXP - currentLevelXP)) * 100;
+
+  return (
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: 10,
+      background: 'var(--glass-bg)',
+      padding: '6px 12px',
+      borderRadius: 12,
+      border: '1px solid var(--border-subtle)',
+      backdropFilter: 'blur(12px)',
+    }}>
+      <div style={{
+        fontSize: 11,
+        fontWeight: 700,
+        color: 'var(--text-muted)',
+        fontFamily: 'var(--font-mono)',
+      }}>LVL {level}</div>
+      <div style={{
+        width: 80,
+        height: 6,
+        background: 'var(--progress-track)',
+        borderRadius: 3,
+        overflow: 'hidden',
+      }}>
+        <div style={{
+          width: `${progress}%`,
+          height: '100%',
+          background: 'linear-gradient(90deg, #f6ad55, #ed8936)',
+          borderRadius: 3,
+          transition: 'width 0.5s ease',
+        }} />
+      </div>
+      <div style={{
+        fontSize: 10,
+        fontWeight: 600,
+        color: 'var(--text-muted)',
+        fontFamily: 'var(--font-mono)',
+      }}>{xp} XP</div>
+    </div>
+  );
+}
+
 /* ─── Navbar ─── */
-function Navbar({ onBack, showBack, rightContent, theme, onThemeToggle }) {
+function Navbar({ onBack, showBack, rightContent, theme, onThemeToggle, xp }) {
   return (
     <nav style={{
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -120,6 +478,7 @@ function Navbar({ onBack, showBack, rightContent, theme, onThemeToggle }) {
         </div>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        {xp !== undefined && <XPBar xp={xp} />}
         {rightContent && <div>{rightContent}</div>}
         <ThemeToggle theme={theme} onToggle={onThemeToggle} />
       </div>
@@ -144,7 +503,7 @@ function ProgressBar({ current, total, color = '#e53e3e' }) {
 }
 
 /* ─── Score Display ─── */
-function ScoreDisplay({ correct, total, label = 'Score', compact = false }) {
+function ScoreDisplay({ correct, total, label = 'Score', compact = false, streak = 0 }) {
   const pct = total > 0 ? Math.round((correct / total) * 100) : 0;
   const color = pct >= 80 ? '#48bb78' : pct >= 60 ? '#ed8936' : total === 0 ? 'var(--text-muted)' : '#fc8181';
   if (compact) {
@@ -159,7 +518,10 @@ function ScoreDisplay({ correct, total, label = 'Score', compact = false }) {
         }}>{total > 0 ? `${pct}%` : '—'}</div>
         <div>
           <div style={{ fontSize: 10, color: 'var(--text-muted)', letterSpacing: 0.8, textTransform: 'uppercase', fontWeight: 600 }}>{label}</div>
-          <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-score-val)' }}>{correct}/{total}</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-score-val)' }}>
+            {correct}/{total}
+            {streak > 0 && <span style={{ marginLeft: 6, fontSize: 12 }}>🔥{streak}</span>}
+          </div>
         </div>
       </div>
     );
@@ -176,25 +538,45 @@ function ScoreDisplay({ correct, total, label = 'Score', compact = false }) {
       }}>{total > 0 ? `${pct}%` : '—'}</div>
       <div>
         <div style={{ fontSize: 11, color: 'var(--text-muted)', letterSpacing: 1, textTransform: 'uppercase', fontWeight: 600 }}>{label}</div>
-        <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-score-val)' }}>{correct}/{total}</div>
+        <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-score-val)' }}>
+          {correct}/{total}
+          {streak > 0 && <span style={{ marginLeft: 8, fontSize: 16 }}>🔥{streak}</span>}
+        </div>
       </div>
     </div>
   );
 }
 
 /* ─── Category Badge ─── */
-function CategoryBadge({ category, size = 'sm' }) {
+function CategoryBadge({ category, size = 'sm', showSVG = false }) {
   const c = CATEGORY_COLORS[category] || { bg: '#4a5568', accent: '#a0aec0' };
   const pad = size === 'lg' ? '5px 14px' : '4px 11px';
   const fs = size === 'lg' ? 11 : 10;
+  const SVGComponent = LYMPHOMA_SVG[category];
+
   return (
     <span style={{
-      display: 'inline-block', padding: pad, borderRadius: 20,
-      background: `${c.accent}14`, color: c.accent, fontSize: fs,
-      fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase',
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: showSVG && SVGComponent ? 8 : 0,
+      padding: pad,
+      borderRadius: 20,
+      background: `${c.accent}14`,
+      color: c.accent,
+      fontSize: fs,
+      fontWeight: 700,
+      letterSpacing: 0.6,
+      textTransform: 'uppercase',
       border: `1px solid ${c.accent}28`,
       backdropFilter: 'blur(8px)',
-    }}>{category}</span>
+    }}>
+      {showSVG && SVGComponent && (
+        <span style={{ display: 'inline-flex', width: size === 'lg' ? 24 : 20, height: size === 'lg' ? 24 : 20 }}>
+          <SVGComponent />
+        </span>
+      )}
+      {category}
+    </span>
   );
 }
 
@@ -226,6 +608,44 @@ function TimerRing({ timeLeft }) {
       background: `${color}0a`,
       boxShadow: timeLeft <= 5 ? `0 0 20px ${color}25` : 'none',
     }}>{timeLeft}</div>
+  );
+}
+
+/* ─── Trophy Display ─── */
+function TrophyDisplay({ score }) {
+  const pct = Math.round((score.correct / score.total) * 100);
+  let trophy = '😊';
+  let message = 'Keep practicing!';
+  let color = '#cbd5e0';
+
+  if (pct >= 90) {
+    trophy = '🏆';
+    message = 'Outstanding!';
+    color = '#f6ad55';
+  } else if (pct >= 70) {
+    trophy = '🥈';
+    message = 'Well done!';
+    color = '#a0aec0';
+  } else if (pct >= 50) {
+    trophy = '🥉';
+    message = 'Good effort!';
+    color = '#d69e2e';
+  }
+
+  return (
+    <div className="animate-bounceIn" style={{
+      fontSize: 80,
+      marginBottom: 16,
+      filter: `drop-shadow(0 4px 20px ${color}40)`,
+    }}>
+      {trophy}
+      <div style={{
+        fontSize: 16,
+        fontWeight: 700,
+        color: 'var(--text-secondary)',
+        marginTop: 8,
+      }}>{message}</div>
+    </div>
   );
 }
 
@@ -291,6 +711,14 @@ export default function App() {
     catch { return 'dark'; }
   });
 
+  // Gamification states
+  const [xp, setXPState] = useState(getXP());
+  const [unlockedAchievements, setUnlockedAchievements] = useState(getAchievements());
+  const [achievementToast, setAchievementToast] = useState(null);
+  const [streak, setStreak] = useState(0);
+  const [earnedXP, setEarnedXP] = useState(0);
+  const [speedAnswers, setSpeedAnswers] = useState([]);
+
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     try { localStorage.setItem('lymphoma-theme', theme); } catch {}
@@ -299,6 +727,27 @@ export default function App() {
   const toggleTheme = useCallback(() => {
     setTheme(t => t === 'dark' ? 'light' : 'dark');
   }, []);
+
+  // XP and Achievement management
+  const addXP = useCallback((amount) => {
+    const newXP = xp + amount;
+    setXPState(newXP);
+    setXP(newXP);
+    setEarnedXP(e => e + amount);
+  }, [xp]);
+
+  const unlockAchievement = useCallback((achievementId) => {
+    if (unlockedAchievements.includes(achievementId)) return;
+
+    const newUnlocked = [...unlockedAchievements, achievementId];
+    setUnlockedAchievements(newUnlocked);
+    setAchievements(newUnlocked);
+
+    const achievement = ACHIEVEMENTS.find(a => a.id === achievementId);
+    if (achievement) {
+      setAchievementToast(achievement);
+    }
+  }, [unlockedAchievements]);
 
   // Timer
   useEffect(() => {
@@ -310,6 +759,7 @@ export default function App() {
       if (mode === 'quickfire' && quizAnswer === null) {
         setQuizAnswer('__timeout__');
         setQuizScore(s => ({ ...s, total: s.total + 1 }));
+        setStreak(0);
       }
     }
     return () => clearInterval(interval);
@@ -331,6 +781,8 @@ export default function App() {
     setGameComplete(false);
     setHistory([]);
     setShowConfetti(false);
+    setStreak(0);
+    setEarnedXP(0);
     setMode('scenario');
   }, []);
 
@@ -344,6 +796,9 @@ export default function App() {
     setShowConfetti(false);
     setTimeLeft(15);
     setTimerActive(true);
+    setStreak(0);
+    setEarnedXP(0);
+    setSpeedAnswers([]);
     setMode('quickfire');
   }, []);
 
@@ -354,15 +809,41 @@ export default function App() {
     const isCorrect = shuffledScenarios[scenarioIdx].options[idx].correct;
     setScenarioScore(s => ({ correct: s.correct + (isCorrect ? 1 : 0), total: s.total + 1 }));
     setHistory(h => [...h, { question: shuffledScenarios[scenarioIdx].title, correct: isCorrect, category: shuffledScenarios[scenarioIdx].category }]);
+
+    // Gamification
+    if (isCorrect) {
+      const newStreak = streak + 1;
+      setStreak(newStreak);
+      const xpGain = 100 + (newStreak > 1 ? 25 : 0);
+      addXP(xpGain);
+
+      // Check first blood
+      if (scenarioScore.total === 0 && scenarioScore.correct === 0) {
+        unlockAchievement('first_blood');
+      }
+    } else {
+      setStreak(0);
+    }
   };
 
   const nextScenario = () => {
     if (scenarioIdx + 1 >= shuffledScenarios.length) {
       setGameComplete(true);
+      const pct = (scenarioScore.correct / shuffledScenarios.length) * 100;
+
       if (scenarioScore.correct >= Math.ceil(shuffledScenarios.length * 0.6)) {
         setShowConfetti(true);
         setTimeout(() => setShowConfetti(false), 5000);
       }
+
+      // Check achievements
+      if (pct >= 80) unlockAchievement('lymphoma_expert');
+      if (pct === 100) unlockAchievement('master_diagnostician');
+
+      // Scholar achievement
+      const totalQuestions = scenarioScore.total + quizScore.total;
+      if (totalQuestions >= 50) unlockAchievement('scholar');
+
       return;
     }
     setScenarioIdx(i => i + 1);
@@ -373,19 +854,55 @@ export default function App() {
 
   const handleQuizAnswer = (opt) => {
     if (quizAnswer !== null) return;
+    const answerTime = 15 - timeLeft;
     setTimerActive(false);
     setQuizAnswer(opt);
     const isCorrect = opt === quizQuestions[quizIdx].a;
     setQuizScore(s => ({ correct: s.correct + (isCorrect ? 1 : 0), total: s.total + 1 }));
+
+    // Gamification
+    if (isCorrect) {
+      const newStreak = streak + 1;
+      setStreak(newStreak);
+      const xpGain = 50 + (newStreak > 1 ? 25 : 0);
+      addXP(xpGain);
+
+      // Track speed
+      setSpeedAnswers(prev => [...prev, answerTime]);
+
+      // First blood
+      if (quizScore.total === 0 && quizScore.correct === 0) {
+        unlockAchievement('first_blood');
+      }
+    } else {
+      setStreak(0);
+    }
   };
 
   const nextQuiz = () => {
     if (quizIdx + 1 >= quizQuestions.length) {
       setGameComplete(true);
+
       if (quizScore.correct >= 10) {
         setShowConfetti(true);
         setTimeout(() => setShowConfetti(false), 5000);
       }
+
+      // Check achievements
+      if (quizScore.correct === quizQuestions.length) {
+        unlockAchievement('perfect_round');
+      }
+
+      // Speed demon - check if 5+ answers were under 5 seconds
+      const fastAnswers = speedAnswers.filter(t => t < 5);
+      if (fastAnswers.length >= 5) {
+        unlockAchievement('speed_demon');
+      }
+
+      // Scholar
+      const totalQuestions = scenarioScore.total + quizScore.total;
+      if (totalQuestions >= 50) unlockAchievement('scholar');
+
       return;
     }
     setQuizIdx(i => i + 1);
@@ -394,22 +911,24 @@ export default function App() {
     setTimerActive(true);
   };
 
-  /* Stat card config for colourful stats */
-  const statCards = [
-    { num: '20', label: 'Clinical Cases', icon: '📋', gradient: 'var(--stat-gradient-1)', border: 'var(--stat-border-1)', numColor: 'var(--stat-num-1)', iconBg: 'var(--stat-icon-1)' },
-    { num: '40+', label: 'Quiz Questions', icon: '🧠', gradient: 'var(--stat-gradient-2)', border: 'var(--stat-border-2)', numColor: 'var(--stat-num-2)', iconBg: 'var(--stat-icon-2)' },
-    { num: '11', label: 'NHL Subtypes', icon: '🔬', gradient: 'var(--stat-gradient-3)', border: 'var(--stat-border-3)', numColor: 'var(--stat-num-3)', iconBg: 'var(--stat-icon-3)' },
-  ];
-
   /* ─── MENU ─── */
   if (mode === 'menu') {
+    const unlockedCount = unlockedAchievements.length;
+
     return (
       <>
         <div className="app-bg" />
         <div className="app-bg-extra" />
+        <div className="histology-bg" />
         <div className="grid-overlay" />
         <div className="app-content">
-          <Navbar showBack={false} theme={theme} onThemeToggle={toggleTheme} />
+          {achievementToast && (
+            <AchievementToast
+              achievement={achievementToast}
+              onClose={() => setAchievementToast(null)}
+            />
+          )}
+          <Navbar showBack={false} theme={theme} onThemeToggle={toggleTheme} xp={xp} />
 
           <div style={{ maxWidth: 780, margin: '0 auto', padding: '44px 20px' }}>
             {/* Hero */}
@@ -484,11 +1003,11 @@ export default function App() {
                   <div style={{ flex: 1 }}>
                     <h2 style={{ margin: '0 0 8px', fontSize: 20, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: -0.3 }}>Clinical Scenarios</h2>
                     <p style={{ margin: '0 0 16px', color: 'var(--text-secondary)', fontSize: 13, lineHeight: 1.65 }}>
-                      20 case-based vignettes with real clinical decisions. Diagnose, classify, and treat patients with aggressive B-cell lymphomas.
+                      26 case-based vignettes with real clinical decisions. Diagnose, classify, and treat patients with aggressive B-cell lymphomas.
                     </p>
                     <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                       {['DLBCL', 'Burkitt', 'MCL', 'PMBCL', 'DHL', 'PTLD', 'MGZL'].map(c => (
-                        <CategoryBadge key={c} category={c} />
+                        <CategoryBadge key={c} category={c} showSVG />
                       ))}
                     </div>
                   </div>
@@ -535,7 +1054,7 @@ export default function App() {
                   <div style={{ flex: 1 }}>
                     <h2 style={{ margin: '0 0 8px', fontSize: 20, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: -0.3 }}>Quick-Fire Quiz</h2>
                     <p style={{ margin: '0 0 16px', color: 'var(--text-secondary)', fontSize: 13, lineHeight: 1.65 }}>
-                      15 rapid-fire questions from a pool of 40+ with a 15-second timer. Test your recall on key facts, landmark trials, and classifications.
+                      15 rapid-fire questions from a pool of 50+ with a 15-second timer. Test your recall on key facts, landmark trials, and classifications.
                     </p>
                     <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
                       <span style={{
@@ -557,40 +1076,181 @@ export default function App() {
               </button>
             </div>
 
-            {/* Stats overview — colourful */}
+            {/* Stats overview */}
             <div className="animate-fadeInUp stagger-4" style={{
-              display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14,
+              display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14,
               marginBottom: 24,
             }}>
-              {statCards.map((s, i) => (
-                <div key={i} style={{
-                  background: s.gradient,
-                  border: `1px solid ${s.border}`,
-                  borderRadius: 16, padding: '20px 16px',
-                  textAlign: 'center',
-                  backdropFilter: 'blur(12px)',
-                  transition: 'all 0.3s ease',
-                }}
-                onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
-                onMouseLeave={e => e.currentTarget.style.transform = ''}
-                >
-                  <div style={{
-                    fontSize: 24, marginBottom: 8,
-                    width: 44, height: 44, borderRadius: 12,
-                    background: s.iconBg,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    margin: '0 auto 10px',
-                  }}>{s.icon}</div>
-                  <div style={{
-                    fontSize: 24, fontWeight: 800, color: s.numColor,
-                    fontFamily: 'var(--font-mono)',
-                  }}>{s.num}</div>
-                  <div style={{
-                    fontSize: 10, color: 'var(--text-muted)', fontWeight: 600,
-                    letterSpacing: 0.6, textTransform: 'uppercase', marginTop: 4,
-                  }}>{s.label}</div>
-                </div>
-              ))}
+              <div style={{
+                background: 'var(--stat-gradient-1)',
+                border: '1px solid var(--stat-border-1)',
+                borderRadius: 16, padding: '20px 16px',
+                textAlign: 'center',
+                backdropFilter: 'blur(12px)',
+                transition: 'all 0.3s ease',
+              }}
+              onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
+              onMouseLeave={e => e.currentTarget.style.transform = ''}
+              >
+                <div style={{
+                  fontSize: 24, marginBottom: 8,
+                  width: 44, height: 44, borderRadius: 12,
+                  background: 'var(--stat-icon-1)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  margin: '0 auto 10px',
+                }}>📋</div>
+                <div style={{
+                  fontSize: 24, fontWeight: 800, color: 'var(--stat-num-1)',
+                  fontFamily: 'var(--font-mono)',
+                }}>26</div>
+                <div style={{
+                  fontSize: 10, color: 'var(--text-muted)', fontWeight: 600,
+                  letterSpacing: 0.6, textTransform: 'uppercase', marginTop: 4,
+                }}>Clinical Cases</div>
+              </div>
+
+              <div style={{
+                background: 'var(--stat-gradient-2)',
+                border: '1px solid var(--stat-border-2)',
+                borderRadius: 16, padding: '20px 16px',
+                textAlign: 'center',
+                backdropFilter: 'blur(12px)',
+                transition: 'all 0.3s ease',
+              }}
+              onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
+              onMouseLeave={e => e.currentTarget.style.transform = ''}
+              >
+                <div style={{
+                  fontSize: 24, marginBottom: 8,
+                  width: 44, height: 44, borderRadius: 12,
+                  background: 'var(--stat-icon-2)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  margin: '0 auto 10px',
+                }}>🧠</div>
+                <div style={{
+                  fontSize: 24, fontWeight: 800, color: 'var(--stat-num-2)',
+                  fontFamily: 'var(--font-mono)',
+                }}>50+</div>
+                <div style={{
+                  fontSize: 10, color: 'var(--text-muted)', fontWeight: 600,
+                  letterSpacing: 0.6, textTransform: 'uppercase', marginTop: 4,
+                }}>Quiz Questions</div>
+              </div>
+
+              <div style={{
+                background: 'var(--stat-gradient-3)',
+                border: '1px solid var(--stat-border-3)',
+                borderRadius: 16, padding: '20px 16px',
+                textAlign: 'center',
+                backdropFilter: 'blur(12px)',
+                transition: 'all 0.3s ease',
+              }}
+              onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
+              onMouseLeave={e => e.currentTarget.style.transform = ''}
+              >
+                <div style={{
+                  fontSize: 24, marginBottom: 8,
+                  width: 44, height: 44, borderRadius: 12,
+                  background: 'var(--stat-icon-3)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  margin: '0 auto 10px',
+                }}>🔬</div>
+                <div style={{
+                  fontSize: 24, fontWeight: 800, color: 'var(--stat-num-3)',
+                  fontFamily: 'var(--font-mono)',
+                }}>11</div>
+                <div style={{
+                  fontSize: 10, color: 'var(--text-muted)', fontWeight: 600,
+                  letterSpacing: 0.6, textTransform: 'uppercase', marginTop: 4,
+                }}>NHL Subtypes</div>
+              </div>
+
+              <div style={{
+                background: 'linear-gradient(135deg, rgba(246,173,85,0.08), rgba(237,137,54,0.08))',
+                border: '1px solid rgba(246,173,85,0.2)',
+                borderRadius: 16, padding: '20px 16px',
+                textAlign: 'center',
+                backdropFilter: 'blur(12px)',
+                transition: 'all 0.3s ease',
+              }}
+              onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
+              onMouseLeave={e => e.currentTarget.style.transform = ''}
+              >
+                <div style={{
+                  fontSize: 24, marginBottom: 8,
+                  width: 44, height: 44, borderRadius: 12,
+                  background: 'rgba(246,173,85,0.15)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  margin: '0 auto 10px',
+                }}>🏆</div>
+                <div style={{
+                  fontSize: 24, fontWeight: 800, color: '#f6ad55',
+                  fontFamily: 'var(--font-mono)',
+                }}>{unlockedCount}/6</div>
+                <div style={{
+                  fontSize: 10, color: 'var(--text-muted)', fontWeight: 600,
+                  letterSpacing: 0.6, textTransform: 'uppercase', marginTop: 4,
+                }}>Achievements</div>
+              </div>
+            </div>
+
+            {/* Achievements Gallery */}
+            <div className="animate-fadeInUp stagger-5" style={{
+              background: 'var(--bg-card)',
+              borderRadius: 20,
+              padding: '28px',
+              border: '1px solid var(--border-card)',
+              marginBottom: 24,
+              backdropFilter: 'blur(16px)',
+            }}>
+              <h3 style={{
+                margin: '0 0 20px',
+                fontSize: 18,
+                fontWeight: 800,
+                color: 'var(--text-primary)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+              }}>
+                <span style={{ fontSize: 24 }}>🏆</span> Achievements
+              </h3>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+                gap: 12,
+              }}>
+                {ACHIEVEMENTS.map(achievement => {
+                  const isUnlocked = unlockedAchievements.includes(achievement.id);
+                  return (
+                    <div key={achievement.id} style={{
+                      background: isUnlocked
+                        ? 'linear-gradient(135deg, rgba(246,173,85,0.15), rgba(237,137,54,0.15))'
+                        : 'var(--bg-option)',
+                      border: `1px solid ${isUnlocked ? 'rgba(246,173,85,0.3)' : 'var(--border-subtle)'}`,
+                      borderRadius: 14,
+                      padding: '16px',
+                      textAlign: 'center',
+                      opacity: isUnlocked ? 1 : 0.5,
+                      filter: isUnlocked ? 'none' : 'grayscale(1)',
+                      transition: 'all 0.3s ease',
+                      boxShadow: isUnlocked ? '0 4px 20px rgba(246,173,85,0.2)' : 'none',
+                    }}>
+                      <div style={{ fontSize: 36, marginBottom: 8 }}>{achievement.icon}</div>
+                      <div style={{
+                        fontSize: 11,
+                        fontWeight: 700,
+                        color: isUnlocked ? '#f6ad55' : 'var(--text-muted)',
+                        marginBottom: 4,
+                      }}>{achievement.name}</div>
+                      <div style={{
+                        fontSize: 9,
+                        color: 'var(--text-dimmed)',
+                        lineHeight: 1.4,
+                      }}>{achievement.description}</div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
 
             <Footer />
@@ -604,17 +1264,27 @@ export default function App() {
   if (mode === 'scenario') {
     if (gameComplete) {
       const passed = scenarioScore.correct >= Math.ceil(shuffledScenarios.length * 0.6);
+      const pct = Math.round((scenarioScore.correct / scenarioScore.total) * 100);
+      const levelGained = Math.floor(earnedXP / 500);
+
       return (
         <>
           <div className="app-bg" />
           <div className="app-bg-extra" />
+          <div className="histology-bg" />
           <div className="grid-overlay" />
           <div className="app-content">
+            {achievementToast && (
+              <AchievementToast
+                achievement={achievementToast}
+                onClose={() => setAchievementToast(null)}
+              />
+            )}
             <Confetti active={showConfetti} />
-            <Navbar showBack onBack={() => setMode('menu')} theme={theme} onThemeToggle={toggleTheme} />
+            <Navbar showBack onBack={() => setMode('menu')} theme={theme} onThemeToggle={toggleTheme} xp={xp} />
             <div style={{ maxWidth: 680, margin: '0 auto', padding: '48px 20px' }}>
               <div className="animate-scaleIn" style={{ textAlign: 'center', marginBottom: 40 }}>
-                <div style={{ fontSize: 72, marginBottom: 18 }}>{passed ? '🎉' : '📚'}</div>
+                <TrophyDisplay score={scenarioScore} />
                 <h2 style={{
                   fontSize: 30, fontWeight: 900, margin: '0 0 8px',
                   background: passed
@@ -625,7 +1295,68 @@ export default function App() {
                 }}>{passed ? 'Excellent Performance!' : 'Keep Studying!'}</h2>
                 <GradientDivider style={{ maxWidth: 100, margin: '16px auto 24px' }} />
                 <div style={{ display: 'inline-block' }}>
-                  <ScoreDisplay correct={scenarioScore.correct} total={scenarioScore.total} label="Clinical Scenarios" />
+                  <ScoreDisplay correct={scenarioScore.correct} total={scenarioScore.total} label="Clinical Scenarios" streak={streak} />
+                </div>
+
+                {/* XP Summary */}
+                <div style={{
+                  marginTop: 28,
+                  background: 'var(--bg-card)',
+                  borderRadius: 16,
+                  padding: '20px',
+                  border: '1px solid var(--border-card)',
+                  backdropFilter: 'blur(12px)',
+                  maxWidth: 400,
+                  margin: '28px auto 0',
+                }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 12 }}>
+                    Session Summary
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                    <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>XP Earned:</span>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: '#f6ad55' }}>+{earnedXP} XP</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                    <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Current Level:</span>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>Level {getLevel(xp)}</span>
+                  </div>
+                  {levelGained > 0 && (
+                    <div style={{
+                      marginTop: 12,
+                      padding: '8px 12px',
+                      background: 'linear-gradient(135deg, rgba(246,173,85,0.15), rgba(237,137,54,0.15))',
+                      border: '1px solid rgba(246,173,85,0.3)',
+                      borderRadius: 10,
+                      fontSize: 12,
+                      fontWeight: 700,
+                      color: '#f6ad55',
+                    }}>
+                      🎉 Level Up! +{levelGained} Level{levelGained > 1 ? 's' : ''}
+                    </div>
+                  )}
+                  <div style={{
+                    marginTop: 14,
+                    height: 8,
+                    background: 'var(--progress-track)',
+                    borderRadius: 4,
+                    overflow: 'hidden',
+                  }}>
+                    <div style={{
+                      width: `${((xp % 500) / 500) * 100}%`,
+                      height: '100%',
+                      background: 'linear-gradient(90deg, #f6ad55, #ed8936)',
+                      borderRadius: 4,
+                      transition: 'width 0.5s ease',
+                    }} />
+                  </div>
+                  <div style={{
+                    marginTop: 6,
+                    fontSize: 10,
+                    color: 'var(--text-dimmed)',
+                    textAlign: 'center',
+                  }}>
+                    {xp % 500}/{500} XP to next level
+                  </div>
                 </div>
               </div>
 
@@ -692,14 +1423,22 @@ export default function App() {
       <>
         <div className="app-bg" />
         <div className="app-bg-extra" />
+        <div className="histology-bg" />
         <div className="grid-overlay" />
         <div className="app-content">
+          {achievementToast && (
+            <AchievementToast
+              achievement={achievementToast}
+              onClose={() => setAchievementToast(null)}
+            />
+          )}
           <Navbar
             showBack
             onBack={() => setMode('menu')}
-            rightContent={<ScoreDisplay correct={scenarioScore.correct} total={scenarioScore.total} compact />}
+            rightContent={<ScoreDisplay correct={scenarioScore.correct} total={scenarioScore.total} compact streak={streak} />}
             theme={theme}
             onThemeToggle={toggleTheme}
+            xp={xp}
           />
           <ProgressBar current={scenarioIdx + 1} total={shuffledScenarios.length} color={catColor.accent} />
 
@@ -715,7 +1454,7 @@ export default function App() {
               }}>
                 CASE {scenarioIdx + 1}/{shuffledScenarios.length}
               </span>
-              <CategoryBadge category={sc.category} size="lg" />
+              <CategoryBadge category={sc.category} size="lg" showSVG />
               <DifficultyBadge difficulty={sc.difficulty} />
             </div>
 
@@ -917,17 +1656,27 @@ export default function App() {
   if (mode === 'quickfire') {
     if (gameComplete) {
       const passed = quizScore.correct >= 10;
+      const pct = Math.round((quizScore.correct / quizScore.total) * 100);
+      const levelGained = Math.floor(earnedXP / 500);
+
       return (
         <>
           <div className="app-bg" />
           <div className="app-bg-extra" />
+          <div className="histology-bg" />
           <div className="grid-overlay" />
           <div className="app-content">
+            {achievementToast && (
+              <AchievementToast
+                achievement={achievementToast}
+                onClose={() => setAchievementToast(null)}
+              />
+            )}
             <Confetti active={showConfetti} />
-            <Navbar showBack onBack={() => setMode('menu')} theme={theme} onThemeToggle={toggleTheme} />
+            <Navbar showBack onBack={() => setMode('menu')} theme={theme} onThemeToggle={toggleTheme} xp={xp} />
             <div style={{ maxWidth: 600, margin: '0 auto', padding: '60px 20px', textAlign: 'center' }}>
               <div className="animate-scaleIn">
-                <div style={{ fontSize: 72, marginBottom: 18 }}>{passed ? '🔥' : '⏱'}</div>
+                <TrophyDisplay score={quizScore} />
                 <h2 style={{
                   fontSize: 30, fontWeight: 900, margin: '0 0 8px',
                   background: passed
@@ -938,7 +1687,68 @@ export default function App() {
                 }}>{passed ? 'Lightning Fast!' : 'Good Attempt!'}</h2>
                 <GradientDivider style={{ maxWidth: 100, margin: '16px auto 24px' }} />
                 <div style={{ display: 'inline-block' }}>
-                  <ScoreDisplay correct={quizScore.correct} total={quizScore.total} label="Quick-Fire Quiz" />
+                  <ScoreDisplay correct={quizScore.correct} total={quizScore.total} label="Quick-Fire Quiz" streak={streak} />
+                </div>
+
+                {/* XP Summary */}
+                <div style={{
+                  marginTop: 28,
+                  background: 'var(--bg-card)',
+                  borderRadius: 16,
+                  padding: '20px',
+                  border: '1px solid var(--border-card)',
+                  backdropFilter: 'blur(12px)',
+                  maxWidth: 400,
+                  margin: '28px auto 0',
+                }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 12 }}>
+                    Session Summary
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                    <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>XP Earned:</span>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: '#f6ad55' }}>+{earnedXP} XP</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                    <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Current Level:</span>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>Level {getLevel(xp)}</span>
+                  </div>
+                  {levelGained > 0 && (
+                    <div style={{
+                      marginTop: 12,
+                      padding: '8px 12px',
+                      background: 'linear-gradient(135deg, rgba(246,173,85,0.15), rgba(237,137,54,0.15))',
+                      border: '1px solid rgba(246,173,85,0.3)',
+                      borderRadius: 10,
+                      fontSize: 12,
+                      fontWeight: 700,
+                      color: '#f6ad55',
+                    }}>
+                      🎉 Level Up! +{levelGained} Level{levelGained > 1 ? 's' : ''}
+                    </div>
+                  )}
+                  <div style={{
+                    marginTop: 14,
+                    height: 8,
+                    background: 'var(--progress-track)',
+                    borderRadius: 4,
+                    overflow: 'hidden',
+                  }}>
+                    <div style={{
+                      width: `${((xp % 500) / 500) * 100}%`,
+                      height: '100%',
+                      background: 'linear-gradient(90deg, #f6ad55, #ed8936)',
+                      borderRadius: 4,
+                      transition: 'width 0.5s ease',
+                    }} />
+                  </div>
+                  <div style={{
+                    marginTop: 6,
+                    fontSize: 10,
+                    color: 'var(--text-dimmed)',
+                    textAlign: 'center',
+                  }}>
+                    {xp % 500}/{500} XP to next level
+                  </div>
                 </div>
               </div>
               <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginTop: 40 }}>
@@ -982,19 +1792,27 @@ export default function App() {
       <>
         <div className="app-bg" />
         <div className="app-bg-extra" />
+        <div className="histology-bg" />
         <div className="grid-overlay" />
         <div className="app-content">
+          {achievementToast && (
+            <AchievementToast
+              achievement={achievementToast}
+              onClose={() => setAchievementToast(null)}
+            />
+          )}
           <Navbar
             showBack
             onBack={() => setMode('menu')}
             rightContent={
               <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                 {quizAnswer === null && <TimerRing timeLeft={timeLeft} />}
-                <ScoreDisplay correct={quizScore.correct} total={quizScore.total} compact />
+                <ScoreDisplay correct={quizScore.correct} total={quizScore.total} compact streak={streak} />
               </div>
             }
             theme={theme}
             onThemeToggle={toggleTheme}
+            xp={xp}
           />
           <ProgressBar current={quizIdx + 1} total={quizQuestions.length} color="#f6ad55" />
 

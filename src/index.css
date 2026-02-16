@@ -7,13 +7,14 @@
 :root {
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
+  --font-serif: 'Georgia', 'Times New Roman', serif;
   --accent-red: #e53e3e;
   --accent-green: #48bb78;
   --accent-orange: #ed8936;
 
-  /* Dark mode (default) — Rich & Colourful */
-  --bg-primary: #0a0a18;
-  --bg-nav: rgba(12,12,28,0.88);
+  /* Dark mode (default) — Medical Journal Aesthetic */
+  --bg-primary: #080818;
+  --bg-nav: rgba(10,10,28,0.92);
   --bg-card: rgba(255,255,255,0.035);
   --bg-card-hover: rgba(255,255,255,0.06);
   --bg-subtle: rgba(255,255,255,0.02);
@@ -22,14 +23,14 @@
   --border-subtle: rgba(255,255,255,0.06);
   --border-card: rgba(255,255,255,0.08);
   --border-option: rgba(255,255,255,0.07);
-  --text-primary: #f2f2fa;
+  --text-primary: #f0f0fa;
   --text-secondary: #b0b4cc;
   --text-muted: #7b7f9a;
   --text-dimmed: #505474;
   --text-vignette: #cdd1e4;
   --text-teaching: #f0d49a;
   --text-footer-name: #b0b4cc;
-  --text-score-val: #f2f2fa;
+  --text-score-val: #f0f0fa;
   --correct-bg: rgba(72,187,120,0.08);
   --correct-border: rgba(72,187,120,0.35);
   --correct-text: #68d391;
@@ -92,19 +93,29 @@
   --stat-gradient-1: linear-gradient(135deg, rgba(99,179,237,0.08), rgba(99,179,237,0.02));
   --stat-gradient-2: linear-gradient(135deg, rgba(183,148,244,0.08), rgba(183,148,244,0.02));
   --stat-gradient-3: linear-gradient(135deg, rgba(246,173,85,0.08), rgba(246,173,85,0.02));
+  --stat-gradient-4: linear-gradient(135deg, rgba(72,187,120,0.08), rgba(72,187,120,0.02));
   --stat-border-1: rgba(99,179,237,0.15);
   --stat-border-2: rgba(183,148,244,0.15);
   --stat-border-3: rgba(246,173,85,0.15);
+  --stat-border-4: rgba(72,187,120,0.15);
   --stat-icon-1: rgba(99,179,237,0.15);
   --stat-icon-2: rgba(183,148,244,0.15);
   --stat-icon-3: rgba(246,173,85,0.15);
+  --stat-icon-4: rgba(72,187,120,0.15);
   --stat-num-1: #63b3ed;
   --stat-num-2: #b794f4;
   --stat-num-3: #f6ad55;
+  --stat-num-4: #68d391;
+  --histology-opacity: 0.04;
+  --achievement-bg: rgba(255,255,255,0.04);
+  --achievement-border: rgba(255,255,255,0.08);
+  --xp-bar-bg: rgba(255,255,255,0.06);
+  --xp-bar-fill: linear-gradient(90deg, #f6ad55, #ed8936, #e53e3e);
+  --trophy-glow: rgba(246,173,85,0.3);
 }
 
 [data-theme="light"] {
-  --bg-primary: #f5f6fb;
+  --bg-primary: #f3f4f9;
   --bg-nav: rgba(255,255,255,0.92);
   --bg-card: rgba(255,255,255,0.7);
   --bg-card-hover: rgba(255,255,255,0.85);
@@ -184,15 +195,25 @@
   --stat-gradient-1: linear-gradient(135deg, rgba(66,153,225,0.1), rgba(66,153,225,0.03));
   --stat-gradient-2: linear-gradient(135deg, rgba(159,122,234,0.1), rgba(159,122,234,0.03));
   --stat-gradient-3: linear-gradient(135deg, rgba(237,137,54,0.1), rgba(237,137,54,0.03));
+  --stat-gradient-4: linear-gradient(135deg, rgba(72,187,120,0.1), rgba(72,187,120,0.03));
   --stat-border-1: rgba(66,153,225,0.2);
   --stat-border-2: rgba(159,122,234,0.2);
   --stat-border-3: rgba(237,137,54,0.2);
+  --stat-border-4: rgba(72,187,120,0.2);
   --stat-icon-1: rgba(66,153,225,0.14);
   --stat-icon-2: rgba(159,122,234,0.14);
   --stat-icon-3: rgba(237,137,54,0.14);
+  --stat-icon-4: rgba(72,187,120,0.14);
   --stat-num-1: #3182ce;
   --stat-num-2: #805ad5;
   --stat-num-3: #dd6b20;
+  --stat-num-4: #38a169;
+  --histology-opacity: 0.03;
+  --achievement-bg: rgba(255,255,255,0.65);
+  --achievement-border: rgba(0,0,0,0.08);
+  --xp-bar-bg: rgba(0,0,0,0.06);
+  --xp-bar-fill: linear-gradient(90deg, #ed8936, #dd6b20, #c53030);
+  --trophy-glow: rgba(237,137,54,0.25);
 }
 
 html {
@@ -242,7 +263,6 @@ body {
   animation: float-orb 26s ease-in-out infinite reverse;
 }
 
-/* Extra colourful orbs via pseudo-element on grid-overlay's parent */
 .app-bg-extra {
   position: fixed;
   inset: 0;
@@ -267,6 +287,32 @@ body {
   width: 45%; height: 45%;
   background: radial-gradient(ellipse, var(--orb-amber) 0%, transparent 65%);
   animation: float-orb-alt 30s ease-in-out infinite reverse;
+}
+
+/* ─── Histology background overlay ─── */
+.histology-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: var(--histology-opacity);
+  background:
+    repeating-conic-gradient(
+      from 0deg at 50% 50%,
+      rgba(229,62,62,0.015) 0deg 30deg,
+      transparent 30deg 60deg
+    ),
+    radial-gradient(circle 120px at 20% 30%, rgba(180,60,100,0.06) 0%, transparent 100%),
+    radial-gradient(circle 100px at 70% 60%, rgba(100,60,180,0.05) 0%, transparent 100%),
+    radial-gradient(circle 80px at 40% 80%, rgba(180,100,60,0.04) 0%, transparent 100%),
+    radial-gradient(circle 150px at 80% 20%, rgba(60,100,180,0.04) 0%, transparent 100%);
+  animation: histology-drift 40s ease-in-out infinite;
+}
+
+@keyframes histology-drift {
+  0%, 100% { transform: scale(1) translate(0, 0); }
+  33% { transform: scale(1.02) translate(1%, -1%); }
+  66% { transform: scale(0.98) translate(-1%, 1%); }
 }
 
 @keyframes float-orb {
@@ -341,11 +387,34 @@ body {
   0%, 100% { opacity: 0.5; }
   50% { opacity: 1; }
 }
+@keyframes trophy-bounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  25% { transform: translateY(-8px) scale(1.1); }
+  50% { transform: translateY(0) scale(1); }
+  75% { transform: translateY(-4px) scale(1.05); }
+}
+@keyframes xp-fill {
+  from { width: 0; }
+}
+@keyframes sparkle {
+  0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1) rotate(180deg); }
+}
+@keyframes medal-spin {
+  0% { transform: rotateY(0deg); }
+  100% { transform: rotateY(360deg); }
+}
+@keyframes cell-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.05); opacity: 1; }
+}
 
 .animate-fadeInUp { animation: fadeInUp 0.55s cubic-bezier(0.22,1,0.36,1) forwards; }
 .animate-fadeIn { animation: fadeIn 0.45s ease forwards; }
 .animate-slideInRight { animation: slideInRight 0.45s cubic-bezier(0.22,1,0.36,1) forwards; }
 .animate-scaleIn { animation: scaleIn 0.4s cubic-bezier(0.22,1,0.36,1) forwards; }
+.animate-trophy { animation: trophy-bounce 1.5s ease infinite; }
+.animate-medal { animation: medal-spin 3s ease-in-out infinite; }
 
 .stagger-1 { animation-delay: 0.06s; opacity: 0; }
 .stagger-2 { animation-delay: 0.12s; opacity: 0; }
@@ -371,4 +440,60 @@ body {
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--glass-border);
   box-shadow: var(--glass-shadow);
+}
+
+/* ─── Achievement toast ─── */
+.achievement-toast {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  z-index: 200;
+  background: var(--achievement-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--achievement-border);
+  border-radius: 16px;
+  padding: 16px 20px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.2), 0 0 30px var(--trophy-glow);
+  animation: slideInRight 0.5s cubic-bezier(0.22,1,0.36,1) forwards,
+             fadeIn 0.3s ease forwards;
+  max-width: 320px;
+}
+
+/* ─── XP Bar ─── */
+.xp-bar-container {
+  width: 100%;
+  height: 8px;
+  background: var(--xp-bar-bg);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.xp-bar-fill {
+  height: 100%;
+  background: var(--xp-bar-fill);
+  border-radius: 4px;
+  transition: width 1s cubic-bezier(0.22,1,0.36,1);
+  position: relative;
+}
+
+.xp-bar-fill::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 20px; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4));
+  animation: shimmer 2s ease infinite;
+}
+
+/* ─── SVG illustration styles ─── */
+.cell-illustration {
+  animation: cell-pulse 4s ease-in-out infinite;
+}
+
+.cell-illustration:hover {
+  animation-play-state: paused;
+  transform: scale(1.1);
+  transition: transform 0.3s ease;
 }

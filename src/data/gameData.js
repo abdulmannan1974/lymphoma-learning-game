@@ -120,7 +120,104 @@ export const GAME_DATA = {
       difficulty: "Advanced",
       teachingPoint: "PTLD key facts: Most important risk factor = pretransplant EBV mismatch. Higher rates in heart/lung (10-25%) vs kidney/liver (1-5%). EBV-negative PTLD has later onset (50-60 months vs 12 months), worse prognosis. Extranodal sites common: GI (~25%), allograft (10-15%), CNS (5-20%)."
     },
-    /* ═══ NEW CLINICAL SCENARIOS FROM CHAPTER 45 ═══ */
+    /* ═══ ASH SAP 9th Ed Ch45 MCQ Questions ═══ */
+    {
+      id: 21,
+      title: "PCNSL Consolidation Dilemma",
+      vignette: "A 38-year-old man with no comorbidities presents with progressive left-sided weakness and is found to have a 6-cm enhancing right temporal lobe mass on MRI. A craniotomy and brain biopsy are performed, demonstrating diffuse large B-cell lymphoma, non-germinal centre subtype, and he is started on dexamethasone. A PET/CT scan shows no evidence of disease outside of the brain, and an eye examination shows no evidence of ocular involvement. He is treated with 4 cycles of rituximab, high-dose methotrexate, cytarabine, and thiotepa (MATRix). A repeat MRI at the end of treatment demonstrates a complete response to therapy.",
+      question: "What is the most appropriate next step?",
+      options: [
+        { text: "Observation", correct: false, explanation: "Observation is not recommended after induction therapy for PCNSL, given the very high rate of relapse without consolidation. Studies consistently show that consolidation therapy improves progression-free survival." },
+        { text: "Etoposide and cytarabine consolidation", correct: false, explanation: "While etoposide and cytarabine have activity, the CALGB 51101 trial showed that autologous SCT with thiotepa/carmustine conditioning was superior to etoposide/cytarabine consolidation (2-year PFS 73% vs 51%)." },
+        { text: "Whole-brain radiation therapy", correct: false, explanation: "Consolidative WBRT has a 90% response rate but causes significant long-term cognitive impairment. The IELSG32 trial showed ASCT consolidation had comparable efficacy with significantly less neurotoxicity compared to WBRT." },
+        { text: "Autologous stem cell transplantation with thiotepa/carmustine conditioning", correct: true, explanation: "The IELSG32 trial found MATRix therapy to be the superior induction regimen, and consolidation with autologous SCT with thiotepa/carmustine conditioning demonstrated comparable efficacy to WBRT but with significantly less cognitive toxicity. CALGB 51101 confirmed ASCT superiority over etoposide/cytarabine (2-year PFS 73% vs 51%)." },
+        { text: "Rituximab and lenalidomide maintenance", correct: false, explanation: "Rituximab and lenalidomide maintenance has been studied in relapsed PCNSL but is not considered a standard initial consolidation strategy after MATRix induction." }
+      ],
+      category: "CNS Lymphoma",
+      difficulty: "Advanced",
+      teachingPoint: "PCNSL consolidation after MATRix induction: ASCT with thiotepa/carmustine is preferred over WBRT (less neurotoxicity, comparable efficacy — IELSG32 trial) and over etoposide/cytarabine (superior PFS — CALGB 51101). Observation alone carries an unacceptably high relapse rate."
+    },
+    {
+      id: 22,
+      title: "Low-Risk Burkitt Response",
+      vignette: "A 61-year-old man presents with a 1-month history of rapidly progressive right axillary swelling and pain. A core biopsy is performed and demonstrates a CD10+ B-cell lymphoma with Ki-67 100% and a starry sky pattern consistent with Burkitt lymphoma. A PET/CT scan demonstrated a 7-cm FDG-avid axillary mass. Lactate dehydrogenase (LDH) was within normal limits, and a bone marrow aspiration and biopsy were negative for disease. He has no central nervous system symptoms, and a lumbar puncture was negative for lymphomatous involvement. Dose-adjusted rituximab, etoposide, prednisone, vincristine, cyclophosphamide, and doxorubicin (DA-R-EPOCH) therapy is started, and a follow-up PET/CT scan after 2 cycles demonstrates a complete response.",
+      question: "What is the most appropriate next step?",
+      options: [
+        { text: "4 more cycles of DA-R-EPOCH", correct: false, explanation: "For low-risk Burkitt lymphoma achieving complete response after 2 cycles of DA-R-EPOCH, only 1 additional cycle is needed (total 3 cycles). More cycles add toxicity without improving outcomes." },
+        { text: "1 more cycle of DA-R-EPOCH", correct: true, explanation: "This patient has low-risk Burkitt lymphoma (normal LDH, nonbulky, nonabdominal disease). For patients in complete response after 2 cycles of DA-R-EPOCH, a third cycle with no further consolidation is indicated. CNS prophylaxis is not needed in low-risk disease. Outcomes without consolidation radiation are excellent." },
+        { text: "1 more cycle of DA-R-EPOCH followed by consolidation radiation", correct: false, explanation: "Consolidation radiation is not necessary in Burkitt lymphoma treated with DA-R-EPOCH. Outcomes without radiation have been excellent in published studies." },
+        { text: "4 more cycles of DA-R-EPOCH with intrathecal methotrexate", correct: false, explanation: "Intrathecal CNS prophylaxis is not routinely needed in low-risk Burkitt lymphoma without CNS involvement. Furthermore, 4 additional cycles is excessive for a patient already in CR." },
+        { text: "1 more cycle of DA-R-EPOCH followed by 2 cycles of high-dose methotrexate", correct: false, explanation: "High-dose methotrexate CNS prophylaxis is reserved for high-risk patients. This patient has low-risk disease with negative lumbar puncture, so additional CNS-directed therapy is not indicated." }
+      ],
+      category: "Burkitt",
+      difficulty: "Advanced",
+      teachingPoint: "Burkitt lymphoma risk stratification guides therapy duration with DA-R-EPOCH. Low-risk (normal LDH, nonbulky, nonabdominal): 3 total cycles if CR after 2. CNS prophylaxis is not needed in low-risk disease. Radiation consolidation is unnecessary with DA-R-EPOCH."
+    },
+    {
+      id: 23,
+      title: "The Leukemic Phase MCL",
+      vignette: "A 63-year-old woman was referred to a haematologist after incidentally being found to have a significant leukocytosis with a white blood count of 21,000/mm³ before elective surgery. Flow cytometry of the peripheral blood demonstrated a κ-restricted B-cell population with CD5 expression. A bone marrow aspiration and biopsy were done, showing involvement of a CD5+ B-cell lymphoproliferative disorder; cyclin D1 was positive by immunohistochemistry, and a t(11;14) was identified on FISH analysis from the marrow aspirate. Ki-67 was 5%, and haemoglobin, platelets, and LDH were within normal limits. A staging PET/CT scan showed no evidence of lymphadenopathy, with mild splenomegaly measuring 13 cm.",
+      question: "What is the most appropriate next step?",
+      options: [
+        { text: "Rituximab and bendamustine followed by autologous stem cell transplantation and rituximab maintenance", correct: false, explanation: "This patient has indolent, leukemic-phase MCL (low Ki-67 5%, no lymphadenopathy, likely SOX11-negative). Intensive induction therapy with ASCT is not warranted for asymptomatic indolent MCL." },
+        { text: "Zanubrutinib", correct: false, explanation: "Zanubrutinib is a BTK inhibitor appropriate for relapsed MCL, but not for initial management of asymptomatic indolent MCL. This patient has low-risk disease that can be observed." },
+        { text: "3 cycles of alternating R-CHOP/R-DHAP with ibrutinib added to R-CHOP", correct: false, explanation: "This is an intensive approach tested in the TRIANGLE study for symptomatic, higher-risk MCL. It is not appropriate for asymptomatic indolent MCL with low Ki-67." },
+        { text: "R-CHOP for 6 cycles", correct: false, explanation: "R-CHOP alone is not the standard for MCL, and furthermore, this patient has asymptomatic indolent disease that does not require immediate treatment." },
+        { text: "Observation", correct: true, explanation: "This patient has mantle cell lymphoma in a leukemic phase, given the immunophenotype and IGH-CCND1 fusion. She has low-risk disease, given the low Ki-67 (5%) and lack of lymphadenopathy; these cases are frequently SOX11-negative as well. Watch and wait (observation) is appropriate for asymptomatic indolent MCL." }
+      ],
+      category: "MCL",
+      difficulty: "Advanced",
+      teachingPoint: "Indolent leukemic-phase MCL: characterised by low Ki-67, frequently SOX11-negative, presenting with peripheral blood and bone marrow involvement WITHOUT lymphadenopathy. Observation is appropriate. This parallels the watch-and-wait approach used in asymptomatic CLL. Always test TP53 — mutated MCL has median OS of only 1.8 years."
+    },
+    {
+      id: 24,
+      title: "Advanced DLBCL Treatment Selection",
+      vignette: "A 51-year-old man sought medical attention for a painless groin mass. On physical examination, he was found to have a 4-cm left inguinal mass that was fixed and nontender; a core biopsy specimen demonstrated diffuse large B-cell lymphoma (DLBCL), germinal centre subtype. FISH testing was negative for MYC and BCL2 rearrangements. A staging PET/CT scan identified lymphadenopathy above and below the diaphragm with no extranodal involvement. White blood count, haemoglobin, platelets, and serum lactate dehydrogenase are all within normal limits. He is asymptomatic from his disease and still working full-time.",
+      question: "What is the most appropriate next step in management?",
+      options: [
+        { text: "R-CHOP for 6 cycles", correct: true, explanation: "This patient has advanced-stage DLBCL (nodal disease above and below the diaphragm). Standard therapy has long been R-CHOP for 6 cycles. DA-R-EPOCH was compared with R-CHOP in CALGB 50303 and conferred increased toxicity without clinical benefit. Pola-R-CHP showed superior PFS in the POLARIX trial, but only patients with IPI ≥2 were included; this patient has IPI 1, so R-CHOP remains the standard." },
+        { text: "DA-EPOCH-R for 6 cycles", correct: false, explanation: "DA-EPOCH-R was compared with R-CHOP in the CALGB 50303 trial and did not show improved outcomes, with more toxicity. DA-EPOCH-R is preferred for PMBCL and double-hit lymphoma, not standard DLBCL." },
+        { text: "R-CHOP plus ibrutinib for 6 cycles", correct: false, explanation: "Adding ibrutinib to R-CHOP did not improve outcomes and was associated with increased toxicity. This combination is not recommended for DLBCL." },
+        { text: "R-CHOP for 4 cycles", correct: false, explanation: "Abbreviated R-CHOP (4 cycles) is for limited-stage, nonbulky DLBCL with favourable IPI. This patient has advanced-stage disease requiring 6 full cycles." },
+        { text: "R-CHOP plus lenalidomide for 6 cycles", correct: false, explanation: "R-CHOP with lenalidomide was not superior to R-CHOP alone in the ROBUST trial for ABC-type DLBCL. This combination is not standard of care." }
+      ],
+      category: "DLBCL",
+      difficulty: "Standard",
+      teachingPoint: "Advanced-stage DLBCL with IPI 1: R-CHOP × 6 remains standard. POLARIX trial (Pola-R-CHP) showed PFS benefit primarily in IPI ≥2 and ABC subtype. CALGB 50303: DA-EPOCH-R = more toxicity, no benefit vs R-CHOP. ROBUST: R-CHOP + lenalidomide not superior in ABC-DLBCL."
+    },
+    {
+      id: 25,
+      title: "HIV-Associated Lymphoma Management",
+      vignette: "A 39-year-old man presented to his primary care physician with fevers, night sweats, and a 50-lb (22.7-kg) weight loss over the preceding 6 months. On physical exam, he appeared to be emaciated, and was noted to have significant anaemia. Laboratory findings: Haemoglobin 9 g/dL, White blood cells 3000/mm³, Platelet count 400,000/mm³, Serum LDH 550 U/L. He had a palpable left supraclavicular lymph node, and an urgent core needle biopsy demonstrated germinal centre B-cell-like diffuse large B-cell lymphoma (DLBCL). A PET/CT scan demonstrated lymphadenopathy above and below the diaphragm. HIV testing is done, and he is found to be HIV-positive with a CD4 count of 65/mm³.",
+      question: "What is the most appropriate next step?",
+      options: [
+        { text: "R-EPOCH with initiation of ART after completion of chemoimmunotherapy", correct: false, explanation: "Delaying ART until after chemotherapy is harmful. ART should be started concurrently with chemotherapy as it is associated with better CR rates, faster immune recovery, and improved overall survival." },
+        { text: "R-CHOP with concurrent ART", correct: false, explanation: "R-CHOP is considered an inferior regimen compared with R-EPOCH in HIV-associated lymphomas. R-EPOCH is preferred in this setting due to better outcomes." },
+        { text: "R-EPOCH for 6 cycles with concurrent ART", correct: true, explanation: "HIV-associated lymphomas are almost always DLBCL or Burkitt lymphoma and are typically at an advanced stage. R-CHOP is considered inferior compared with R-EPOCH in this setting. ART should be initiated concurrently — it improves CR rates and immune reconstitution. Although data suggest increased fatal complications with rituximab when CD4 <50/mm³, this patient has CD4 of 65, so rituximab should be included. Newer ART formulations have fewer drug-drug interactions." },
+        { text: "R-CHOP with ART after completion of therapy", correct: false, explanation: "This has two problems: R-CHOP is inferior to R-EPOCH in HIV-associated lymphoma, and ART should never be delayed until after chemotherapy completion." },
+        { text: "CODOX-M/IVAC with concurrent ART", correct: false, explanation: "CODOX-M/IVAC is an appropriate regimen for Burkitt lymphoma but is not a standard treatment option for DLBCL. This patient has GCB-type DLBCL." }
+      ],
+      category: "HIV Lymphoma",
+      difficulty: "Advanced",
+      teachingPoint: "HIV-associated DLBCL: R-EPOCH with concurrent ART is preferred. R-CHOP is inferior in this setting. ART should NEVER be delayed — concurrent use improves outcomes. Rituximab is safe with CD4 >50/mm³. CD4 <50 may increase fatal infectious complications with rituximab."
+    },
+    {
+      id: 26,
+      title: "Young Woman with PMBCL",
+      vignette: "A 28-year-old woman presented to the emergency department with severe dyspnoea on exertion and chest pressure. A chest X-ray demonstrated a large mediastinal mass, and a CT angiogram of the chest demonstrated a 12-cm mediastinal mass with extensive thrombosis of both internal jugular veins. A core biopsy was performed and demonstrated a CD20+ B-cell lymphoma with concurrent expression of CD30+ and PD-L1, consistent with primary mediastinal B-cell lymphoma (PMBCL). She is given systemic steroids and anticoagulation and is discharged. A PET/CT scan done the following week demonstrates no evidence of disease outside of the mediastinum.",
+      question: "What is the most appropriate therapy?",
+      options: [
+        { text: "DA-EPOCH-R for 6 cycles with planned consolidation radiation", correct: false, explanation: "With DA-EPOCH-R, most patients do NOT need consolidation radiation therapy. The phase 2 trial from NIH showed only 2/51 patients required RT. Planned consolidation radiation is unnecessary and exposes this young woman to late radiation risks." },
+        { text: "DA-EPOCH-R for 6 cycles without consolidation radiation", correct: true, explanation: "This patient has newly diagnosed PMBCL. Treatment consists of 6 cycles of either R-CHOP or DA-R-EPOCH. Importantly, patients with DA-R-EPOCH largely do not need consolidation radiation therapy as per the NIH phase 2 trial. This spares a 28-year-old woman from long-term radiation risks including breast cancer and cardiopulmonary disease." },
+        { text: "R-CHOP for 4 cycles followed by consolidation radiation", correct: false, explanation: "R-CHOP for 4 cycles is insufficient for PMBCL. Standard therapy is 6 cycles of chemoimmunotherapy. Abbreviated courses risk inferior outcomes in this aggressive entity." },
+        { text: "Pembrolizumab", correct: false, explanation: "Pembrolizumab is approved for relapsed PMBCL but not for untreated disease. While PMBCL has 9p24.1 amplification driving PD-L1 expression, frontline therapy remains chemoimmunotherapy." },
+        { text: "Brentuximab vedotin with nivolumab", correct: false, explanation: "This combination has clinical data supporting use in relapsed but not newly diagnosed PMBCL, and it is not an FDA-approved combination for this entity." }
+      ],
+      category: "PMBCL",
+      difficulty: "Standard",
+      teachingPoint: "Newly diagnosed PMBCL: DA-R-EPOCH × 6 without consolidation RT is preferred (NIH phase 2 trial — only 2/51 needed RT). Avoids long-term radiation risks in young patients. Pembrolizumab is for relapsed PMBCL only. The 9p24.1 amplification drives PD-L1 overexpression — a therapeutic target in relapsed disease."
+    },
+    /* ═══ ORIGINAL NEW CLINICAL SCENARIOS ═══ */
     {
       id: 9,
       title: "The Limited-Stage Success",
@@ -345,7 +442,16 @@ export const GAME_DATA = {
     { q: "What is the 5-year PFS of the cytarabine-containing arm in the European MCL Network trial?", a: "65%", options: ["40%", "55%", "65%", "80%"] },
     { q: "R-BAC has shown an ORR of 83% in relapsed MCL especially after which prior therapy?", a: "BTK inhibitors", options: ["R-CHOP", "BTK inhibitors", "ASCT", "Lenalidomide"] },
     { q: "What common mutations characterise PCNSL?", a: "CD79B, MYD88, PIM1", options: ["TP53, ATM, NOTCH1", "CD79B, MYD88, PIM1", "BRAF, RAS, MYC", "BCL2, BCL6, IRF4"] },
-    { q: "What percentage of DHL patients have MYC and BCL2 rearrangements?", a: "5-10% of all DLBCL", options: ["1-2% of all DLBCL", "5-10% of all DLBCL", "20-25% of all DLBCL", "40-50% of all DLBCL"] }
+    { q: "What percentage of DHL patients have MYC and BCL2 rearrangements?", a: "5-10% of all DLBCL", options: ["1-2% of all DLBCL", "5-10% of all DLBCL", "20-25% of all DLBCL", "40-50% of all DLBCL"] },
+    /* ── ASH SAP Ch45 MCQ-derived Quick-Fire ── */
+    { q: "What is the preferred consolidation for PCNSL after MATRix induction?", a: "ASCT with thiotepa/carmustine", options: ["WBRT", "ASCT with thiotepa/carmustine", "Etoposide + cytarabine", "Rituximab maintenance"] },
+    { q: "In CALGB 51101, what was the 2-year PFS in the ASCT arm for PCNSL?", a: "73%", options: ["51%", "65%", "73%", "85%"] },
+    { q: "How many total cycles of DA-R-EPOCH for low-risk Burkitt in CR after 2 cycles?", a: "3 total cycles", options: ["2 total cycles", "3 total cycles", "4 total cycles", "6 total cycles"] },
+    { q: "What Ki-67 level suggests indolent MCL suitable for observation?", a: "≤10% (e.g., 5%)", options: ["≤10% (e.g., 5%)", "20-30%", "40-50%", "≥60%"] },
+    { q: "In the POLARIX trial, which DLBCL subgroup benefited most from Pola-R-CHP?", a: "ABC subtype with IPI ≥2", options: ["GCB subtype with IPI 0-1", "ABC subtype with IPI ≥2", "All DLBCL equally", "Double-hit lymphoma"] },
+    { q: "What CD4 threshold makes rituximab safe in HIV-associated lymphoma?", a: ">50/mm³", options: [">50/mm³", ">100/mm³", ">200/mm³", ">350/mm³"] },
+    { q: "What percentage of PMBCL patients needed RT after DA-EPOCH-R in the NIH trial?", a: "~4% (2/51)", options: ["~4% (2/51)", "~15%", "~30%", "~50%"] },
+    { q: "What trial showed ASCT superiority over etoposide/cytarabine for PCNSL consolidation?", a: "CALGB 51101", options: ["IELSG32", "CALGB 51101", "POLARIX", "CORAL"] }
   ]
 };
 
