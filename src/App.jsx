@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { GAME_DATA, CATEGORY_COLORS, shuffleArray } from './data/gameData'
 
 /* ─── Theme Toggle Icon ─── */
@@ -53,6 +53,139 @@ function BrandName({ size = 'sm' }) {
       <span style={{ color: '#e53e3e', fontSize: dropFs, verticalAlign: 'middle' }}>🩸</span>
       <span style={{ color: 'var(--text-primary)' }}>Doctor</span>
     </span>
+  );
+}
+
+/* ─── Ambient Music Player (Web Audio API) ─── */
+function MusicPlayer() {
+  const [playing, setPlaying] = useState(false);
+  const [vol, setVol] = useState(0.25);
+  const ctxRef = useRef(null);
+  const gainRef = useRef(null);
+  const nodesRef = useRef([]);
+
+  const createAmbient = useCallback(() => {
+    if (ctxRef.current) return;
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    ctxRef.current = ctx;
+    const masterGain = ctx.createGain();
+    masterGain.gain.value = vol;
+    masterGain.connect(ctx.destination);
+    gainRef.current = masterGain;
+
+    // Ambient pad: layered detuned oscillators with slow LFO
+    const notes = [130.81, 164.81, 196.00, 246.94, 293.66]; // C3, E3, G3, B3, D4
+    const nodes = [];
+    notes.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      osc.detune.value = (i - 2) * 3; // slight detuning for warmth
+
+      const oscGain = ctx.createGain();
+      oscGain.gain.value = 0.04;
+
+      // LFO for gentle volume swell
+      const lfo = ctx.createOscillator();
+      lfo.type = 'sine';
+      lfo.frequency.value = 0.08 + i * 0.015; // very slow
+      const lfoGain = ctx.createGain();
+      lfoGain.gain.value = 0.015;
+      lfo.connect(lfoGain);
+      lfoGain.connect(oscGain.gain);
+      lfo.start();
+
+      // Filter for warmth
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.value = 800 + i * 100;
+      filter.Q.value = 0.5;
+
+      osc.connect(filter);
+      filter.connect(oscGain);
+      oscGain.connect(masterGain);
+      osc.start();
+
+      nodes.push(osc, lfo);
+    });
+
+    // Soft noise layer for atmosphere
+    const bufferSize = ctx.sampleRate * 2;
+    const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * 0.008;
+    const noise = ctx.createBufferSource();
+    noise.buffer = noiseBuffer;
+    noise.loop = true;
+    const noiseFilter = ctx.createBiquadFilter();
+    noiseFilter.type = 'lowpass';
+    noiseFilter.frequency.value = 400;
+    noise.connect(noiseFilter);
+    noiseFilter.connect(masterGain);
+    noise.start();
+    nodes.push(noise);
+
+    nodesRef.current = nodes;
+  }, [vol]);
+
+  const toggle = useCallback(() => {
+    if (!playing) {
+      createAmbient();
+      if (ctxRef.current?.state === 'suspended') ctxRef.current.resume();
+      setPlaying(true);
+    } else {
+      ctxRef.current?.suspend();
+      setPlaying(false);
+    }
+  }, [playing, createAmbient]);
+
+  useEffect(() => {
+    if (gainRef.current) gainRef.current.gain.value = vol;
+  }, [vol]);
+
+  useEffect(() => {
+    return () => {
+      nodesRef.current.forEach(n => { try { n.stop(); } catch {} });
+      ctxRef.current?.close();
+    };
+  }, []);
+
+  return (
+    <div style={{
+      position: 'fixed', bottom: 16, right: 16, zIndex: 60,
+      display: 'flex', alignItems: 'center', gap: 8,
+      background: 'var(--bg-nav)', backdropFilter: 'blur(20px)',
+      border: '1px solid var(--border-subtle)', borderRadius: 14,
+      padding: '8px 14px', boxShadow: 'var(--card-shadow)',
+      transition: 'all 0.3s ease',
+    }}>
+      <button onClick={toggle} aria-label={playing ? 'Pause music' : 'Play music'} style={{
+        background: 'none', border: 'none', cursor: 'pointer',
+        fontSize: 18, lineHeight: 1, padding: 0,
+        color: playing ? '#e53e3e' : 'var(--text-muted)',
+        transition: 'color 0.3s',
+      }}>
+        {playing ? '🎵' : '🔇'}
+      </button>
+      {playing && (
+        <input type="range" min="0" max="0.5" step="0.01" value={vol}
+          onChange={e => setVol(+e.target.value)}
+          aria-label="Volume"
+          style={{
+            width: 60, height: 3, appearance: 'none', WebkitAppearance: 'none',
+            background: `linear-gradient(to right, #e53e3e ${vol / 0.5 * 100}%, var(--border-subtle) ${vol / 0.5 * 100}%)`,
+            borderRadius: 2, outline: 'none', cursor: 'pointer',
+            accentColor: '#e53e3e',
+          }}
+        />
+      )}
+      <span style={{
+        fontSize: 9, color: 'var(--text-dimmed)', fontWeight: 600,
+        letterSpacing: 0.3, textTransform: 'uppercase',
+      }}>
+        {playing ? 'Ambient' : 'Music'}
+      </span>
+    </div>
   );
 }
 
@@ -290,7 +423,7 @@ export default function App() {
   }, []);
 
   const startQuickFire = useCallback(() => {
-    const q = shuffleArray(GAME_DATA.quickFireQuestions).slice(0, 10);
+    const q = shuffleArray(GAME_DATA.quickFireQuestions).slice(0, 15);
     setQuizQuestions(q);
     setQuizIdx(0);
     setQuizAnswer(null);
@@ -337,7 +470,7 @@ export default function App() {
   const nextQuiz = () => {
     if (quizIdx + 1 >= quizQuestions.length) {
       setGameComplete(true);
-      if (quizScore.correct >= 7) {
+      if (quizScore.correct >= 10) {
         setShowConfetti(true);
         setTimeout(() => setShowConfetti(false), 5000);
       }
@@ -357,6 +490,7 @@ export default function App() {
         <div className="grid-overlay" />
         <div className="app-content">
           <Navbar showBack={false} theme={theme} onThemeToggle={toggleTheme} />
+          <MusicPlayer />
 
           <div style={{ maxWidth: 780, margin: '0 auto', padding: '40px 20px' }}>
             {/* Hero */}
@@ -418,10 +552,10 @@ export default function App() {
                   <div style={{ flex: 1 }}>
                     <h2 style={{ margin: '0 0 6px', fontSize: 19, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: -0.3 }}>Clinical Scenarios</h2>
                     <p style={{ margin: '0 0 14px', color: 'var(--text-secondary)', fontSize: 13, lineHeight: 1.6 }}>
-                      8 case-based vignettes with real clinical decisions. Diagnose, classify, and treat patients with aggressive B-cell lymphomas.
+                      20 case-based vignettes with real clinical decisions. Diagnose, classify, and treat patients with aggressive B-cell lymphomas.
                     </p>
                     <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                      {['DLBCL', 'Burkitt', 'MCL', 'PMBCL', 'DHL', 'PTLD'].map(c => (
+                      {['DLBCL', 'Burkitt', 'MCL', 'PMBCL', 'DHL', 'PTLD', 'MGZL'].map(c => (
                         <CategoryBadge key={c} category={c} />
                       ))}
                     </div>
@@ -461,14 +595,14 @@ export default function App() {
                   <div style={{ flex: 1 }}>
                     <h2 style={{ margin: '0 0 6px', fontSize: 19, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: -0.3 }}>Quick-Fire Quiz</h2>
                     <p style={{ margin: '0 0 14px', color: 'var(--text-secondary)', fontSize: 13, lineHeight: 1.6 }}>
-                      10 rapid-fire questions with a 15-second timer. Test your recall on key facts, landmark trials, and classifications.
+                      15 rapid-fire questions from a pool of 40+ with a 15-second timer. Test your recall on key facts, landmark trials, and classifications.
                     </p>
                     <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
                       <span style={{ color: '#f6ad55', fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
                         <span style={{ fontSize: 14 }}>⏱</span> 15s per question
                       </span>
                       <span style={{ color: 'var(--text-dimmed)' }}>&middot;</span>
-                      <span style={{ color: 'var(--text-muted)', fontSize: 12, fontWeight: 500 }}>10 questions</span>
+                      <span style={{ color: 'var(--text-muted)', fontSize: 12, fontWeight: 500 }}>15 questions</span>
                     </div>
                   </div>
                   <div style={{ color: 'var(--text-dimmed)', fontSize: 20, flexShrink: 0, alignSelf: 'center' }}>&rarr;</div>
@@ -482,9 +616,9 @@ export default function App() {
               marginBottom: 20,
             }}>
               {[
-                { num: '8', label: 'Clinical Cases', icon: '📋' },
-                { num: '15', label: 'Quiz Questions', icon: '🧠' },
-                { num: '8', label: 'NHL Subtypes', icon: '🔬' },
+                { num: '20', label: 'Clinical Cases', icon: '📋' },
+                { num: '40+', label: 'Quiz Questions', icon: '🧠' },
+                { num: '11', label: 'NHL Subtypes', icon: '🔬' },
               ].map((s, i) => (
                 <div key={i} style={{
                   background: 'var(--stat-card-bg)',
@@ -517,6 +651,7 @@ export default function App() {
           <div className="app-content">
             <Confetti active={showConfetti} />
             <Navbar showBack onBack={() => setMode('menu')} theme={theme} onThemeToggle={toggleTheme} />
+            <MusicPlayer />
             <div style={{ maxWidth: 680, margin: '0 auto', padding: '40px 20px' }}>
               <div className="animate-scaleIn" style={{ textAlign: 'center', marginBottom: 36 }}>
                 <div style={{ fontSize: 64, marginBottom: 16 }}>{passed ? '🎉' : '📚'}</div>
@@ -588,6 +723,7 @@ export default function App() {
             theme={theme}
             onThemeToggle={toggleTheme}
           />
+          <MusicPlayer />
           <ProgressBar current={scenarioIdx + 1} total={shuffledScenarios.length} color={catColor.accent} />
 
           <div style={{ maxWidth: 780, margin: '0 auto', padding: '20px 20px' }} ref={contentRef}>
@@ -782,7 +918,7 @@ export default function App() {
   /* ─── QUICK-FIRE MODE ─── */
   if (mode === 'quickfire') {
     if (gameComplete) {
-      const passed = quizScore.correct >= 7;
+      const passed = quizScore.correct >= 10;
       return (
         <>
           <div className="app-bg" />
@@ -790,6 +926,7 @@ export default function App() {
           <div className="app-content">
             <Confetti active={showConfetti} />
             <Navbar showBack onBack={() => setMode('menu')} theme={theme} onThemeToggle={toggleTheme} />
+            <MusicPlayer />
             <div style={{ maxWidth: 600, margin: '0 auto', padding: '60px 20px', textAlign: 'center' }}>
               <div className="animate-scaleIn">
                 <div style={{ fontSize: 64, marginBottom: 16 }}>{passed ? '🔥' : '⏱'}</div>
@@ -847,6 +984,7 @@ export default function App() {
             theme={theme}
             onThemeToggle={toggleTheme}
           />
+          <MusicPlayer />
           <ProgressBar current={quizIdx + 1} total={quizQuestions.length} color="#f6ad55" />
 
           <div style={{ maxWidth: 660, margin: '0 auto', padding: '24px 20px' }}>
