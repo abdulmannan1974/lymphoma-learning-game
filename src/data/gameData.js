@@ -397,6 +397,157 @@ export const GAME_DATA = {
       category: "T/HRLBCL",
       difficulty: "Advanced",
       teachingPoint: "T-cell/histiocyte-rich DLBCL: Rare variant with <10% neoplastic B-cells in a T-cell/histiocyte-rich background. Presents at advanced stage with liver, spleen, and bone marrow involvement. Can transform from NLPHL. Treat with R-CHOP (similar outcomes to DLBCL NOS). CAR-T therapy is NOT effective in relapsed/refractory T/HRLBCL cases."
+    },
+    /* ═══ DIAGNOSTIC PATHOLOGY MCQs for Haematopathology Residents ═══ */
+    {
+      id: 27,
+      title: "The Hans Algorithm Challenge",
+      vignette: "A 64-year-old man undergoes excisional biopsy of a 5 cm cervical lymph node. Histology shows effacement of architecture by sheets of large lymphoid cells with a diffuse growth pattern. IHC panel: CD20+, CD10−, BCL6+, IRF4/MUM1+, CD5−, cyclin D1−. Ki-67 is 70%. FISH shows no MYC, BCL2, or BCL6 rearrangements.",
+      question: "Based on the Hans algorithm, what is the cell-of-origin classification, and why is this clinically significant?",
+      options: [
+        { text: "Non-GCB (ABC) subtype — associated with inferior prognosis and greater benefit from Pola-R-CHP", correct: true, explanation: "The Hans algorithm classifies DLBCL as GCB if CD10+ OR if CD10−/BCL6+/MUM1−. This case is CD10−/BCL6+/MUM1+, making it non-GCB (ABC). ABC-DLBCL has inferior outcomes regardless of IPI, and the POLARIX trial showed the greatest PFS benefit of Pola-R-CHP over R-CHOP in the ABC subtype with IPI ≥2." },
+        { text: "GCB subtype — BCL6 positivity alone defines GCB origin", correct: false, explanation: "BCL6 alone does not classify as GCB. The Hans algorithm requires CD10+ OR (CD10−/BCL6+/MUM1−). Since MUM1 is positive here, this is non-GCB despite BCL6 positivity." },
+        { text: "Unclassifiable — FISH is needed to determine cell of origin", correct: false, explanation: "The Hans algorithm uses IHC (CD10, BCL6, IRF4/MUM1), not FISH, to determine cell of origin. FISH is used separately to detect gene rearrangements for DHL classification." },
+        { text: "GCB subtype — absence of MYC rearrangement indicates germinal centre origin", correct: false, explanation: "MYC rearrangement status does not determine cell of origin. The Hans algorithm is based on CD10, BCL6, and IRF4/MUM1 expression patterns." }
+      ],
+      category: "DLBCL",
+      difficulty: "Advanced",
+      teachingPoint: "Hans algorithm: CD10+ → GCB. If CD10−: BCL6+/MUM1− → GCB; BCL6+/MUM1+ or BCL6−/MUM1+ → non-GCB (ABC). Sensitivity: 71% GCB, 88% non-GCB. Newer assays like Lymph2Cx enable real-time COO from FFPE with higher accuracy."
+    },
+    {
+      id: 28,
+      title: "Double Expressor vs Double Hit",
+      vignette: "A 59-year-old woman is diagnosed with DLBCL after an excisional biopsy of a retroperitoneal mass. IHC shows: CD20+, CD10+, BCL6+, MUM1−, MYC protein (55% positive), BCL2 protein (85% positive). The pathologist reports this as a 'double expressor' lymphoma. The treating haematologist asks whether FISH testing for MYC and BCL2 rearrangements should be performed.",
+      question: "What is the key diagnostic distinction between double expressor and double-hit lymphoma, and what is the clinical implication?",
+      options: [
+        { text: "Double expressor = IHC protein co-expression only; double hit = FISH-confirmed gene rearrangements — FISH is essential to distinguish them as DHL requires more intensive therapy", correct: true, explanation: "Double expressor lymphoma (DEL) is defined by MYC and BCL2 protein co-expression by IHC (~30% of DLBCL) — it has inferior prognosis but is still classified as DLBCL-NOS. Double-hit lymphoma (5-10% of DLBCL) requires FISH-confirmed MYC AND BCL2 gene rearrangements and is reclassified as high-grade B-cell lymphoma in WHO-HAEM5. DHL requires DA-EPOCH-R rather than R-CHOP." },
+        { text: "Both terms are interchangeable — they describe the same entity", correct: false, explanation: "These are distinct entities. Double expressor = protein overexpression by IHC. Double hit = gene rearrangements by FISH. They carry different prognoses and different WHO classifications." },
+        { text: "FISH testing is unnecessary because IHC protein expression correlates perfectly with gene rearrangements", correct: false, explanation: "MYC protein expression occurs in about one-third of cases as a 'double expressor' but only 5-10% have actual FISH rearrangements (double-hit). IHC does not reliably predict FISH status; therefore FISH testing is essential." },
+        { text: "Double hit = IHC co-expression; double expressor = FISH rearrangements", correct: false, explanation: "This is reversed. Double expressor = IHC protein co-expression. Double hit = FISH-confirmed gene rearrangements. DHL is the more aggressive entity requiring intensive therapy." }
+      ],
+      category: "DHL",
+      difficulty: "Advanced",
+      teachingPoint: "Double expressor (IHC): MYC+ and BCL2+ protein = ~30% of DLBCL, worse prognosis but still DLBCL-NOS. Double hit (FISH): MYC and BCL2 gene rearrangements = 5-10%, reclassified as high-grade B-cell lymphoma (WHO-HAEM5). Triple-hit adds BCL6 rearrangement. Always do FISH if MYC protein is expressed on IHC."
+    },
+    {
+      id: 29,
+      title: "The Blastoid MCL Dilemma",
+      vignette: "A 57-year-old man presents with rapidly progressive lymphadenopathy. Lymph node biopsy shows a diffuse infiltrate of medium-to-large lymphoid cells with blastoid morphology, high mitotic rate, and Ki-67 of 85%. IHC: CD20+, CD5+, CD10−, CD23−, cyclin D1+. FISH confirms t(11;14). TP53 mutation is detected on next-generation sequencing.",
+      question: "What is the diagnosis and what is the prognostic significance of this morphologic variant?",
+      options: [
+        { text: "Blastoid variant MCL — aggressive subtype with TP53 mutation conferring median OS of only 1.8 years and resistance to conventional chemotherapy", correct: true, explanation: "This is blastoid variant MCL, characterised by large blastoid cells, high Ki-67 (>30%), and frequent TP53 mutations. TP53-mutated MCL has a distinctively aggressive course with median OS of only 1.8 years regardless of treatment. The blastoid morphology with high proliferative index and TP53 mutation identifies the most aggressive MCL subgroup. Novel agents (BTK inhibitors, CAR-T) offer some hope in this setting." },
+        { text: "DLBCL with aberrant CD5 expression — treat with R-CHOP", correct: false, explanation: "CD5+ DLBCL is a diagnostic consideration, but cyclin D1 positivity and t(11;14) by FISH definitively identify this as MCL, not DLBCL. The blastoid morphology can mimic DLBCL, making IHC and FISH essential." },
+        { text: "Burkitt lymphoma — the high Ki-67 is diagnostic", correct: false, explanation: "While Burkitt has Ki-67 ~100%, the immunophenotype here (CD5+, CD10−, cyclin D1+, t(11;14)) is classic for MCL, not Burkitt (which is CD10+, CD5−, t(8;14)). Ki-67 alone does not define Burkitt lymphoma." },
+        { text: "Indolent MCL with unusually high Ki-67 — observe and watch", correct: false, explanation: "This is the opposite of indolent MCL. Indolent MCL has low Ki-67 (≤10%), is SOX11-negative, and lacks blastoid morphology. This blastoid variant with Ki-67 85% and TP53 mutation is the most aggressive MCL subtype." }
+      ],
+      category: "MCL",
+      difficulty: "Advanced",
+      teachingPoint: "Blastoid MCL: Large cells, high Ki-67 (>30%), frequent TP53 mutations. TP53-mutated MCL = median OS 1.8 years. Distinguish from CD5+ DLBCL by cyclin D1/t(11;14). Indolent MCL (SOX11−, low Ki-67) is the polar opposite. Always test TP53 at diagnosis AND relapse — it guides prognosis and therapy."
+    },
+    {
+      id: 30,
+      title: "The Starry Sky Diagnostic Puzzle",
+      vignette: "A 22-year-old African male presents with a jaw mass that has been growing rapidly over 2 weeks. Biopsy shows a diffuse infiltrate of medium-sized monomorphic lymphoid cells with basophilic cytoplasm, prominent cytoplasmic vacuoles, and an extremely high mitotic rate. Numerous tingible body macrophages are scattered throughout, creating a characteristic pattern. IHC: CD20+, CD10+, BCL6+, BCL2−, Ki-67 approaching 100%. EBER ISH is positive.",
+      question: "What is the most likely diagnosis, and which cytogenetic finding would confirm it?",
+      options: [
+        { text: "Endemic Burkitt lymphoma — t(8;14)(q24;q32) involving MYC and immunoglobulin heavy chain locus", correct: true, explanation: "This is classic endemic Burkitt lymphoma: African child/young adult with jaw mass, 'starry sky' pattern (tingible body macrophages phagocytosing apoptotic cells), medium-sized cells with Ki-67 ~100%, EBV-positive. The hallmark translocation t(8;14) juxtaposes MYC with the IgH locus. Variant translocations t(2;8) and t(8;22) involve light chain loci. Nearly all endemic cases are EBV+, while sporadic cases are EBV+ in only a minority." },
+        { text: "DLBCL with high proliferative index — t(14;18) involving BCL2", correct: false, explanation: "The morphology (medium-sized, monomorphic cells, starry sky pattern, Ki-67 ~100%) and clinical presentation (jaw mass in young African male) are classic for Burkitt, not DLBCL. t(14;18) is associated with follicular lymphoma." },
+        { text: "High-grade B-cell lymphoma NOS — t(11;14) involving cyclin D1", correct: false, explanation: "t(11;14) is the hallmark of MCL, not high-grade B-cell lymphoma NOS. This case has all the features of Burkitt lymphoma. High-grade B-cell lymphoma NOS has features intermediate between DLBCL and BL but lacks MYC/BCL2 rearrangements." },
+        { text: "Lymphoblastic lymphoma — t(12;21) involving TEL-AML1", correct: false, explanation: "Lymphoblastic lymphoma presents with TdT+ immature lymphoblasts, unlike the mature B-cell markers seen here (CD20+, CD10+). t(12;21) is associated with B-ALL in children, not Burkitt lymphoma." }
+      ],
+      category: "Burkitt",
+      difficulty: "Standard",
+      teachingPoint: "Burkitt diagnostic triad: (1) 'Starry sky' pattern from tingible body macrophages, (2) Ki-67 ~100%, (3) cMYC translocation — t(8;14) in 80%, variants t(2;8) or t(8;22). BCL2 is typically NEGATIVE. Endemic (EBV+, jaw) vs sporadic (abdominal) vs HIV-associated. Medium-sized monomorphic cells with basophilic cytoplasm and cytoplasmic vacuoles."
+    },
+    {
+      id: 31,
+      title: "The PMBCL vs cHL Conundrum",
+      vignette: "A 30-year-old woman presents with a 10 cm anterior mediastinal mass and SVC syndrome. Core biopsy shows large B-cells with clear cytoplasm embedded in compartmentalising fibrosis (sclerosis). IHC: CD19+, CD20+, weak CD30+, CD15−, surface Ig negative, PAX5 strongly positive. Gene expression profiling shows a unique signature with similarity to classical Hodgkin lymphoma. The tumour shows 9p24.1 amplification by FISH.",
+      question: "What is the diagnosis, and what is the therapeutic relevance of the 9p24.1 amplification?",
+      options: [
+        { text: "Primary mediastinal large B-cell lymphoma — 9p24.1 drives PD-L1 overexpression, therapeutically targetable with checkpoint inhibitors in relapsed disease", correct: true, explanation: "This is PMBCL: young woman, anterior mediastinal mass, sclerosis, lacks surface Ig, CD19/CD20+, weak CD30+, CD15−. PMBCL is molecularly distinct from DLBCL but shares gene expression features with cHL. The 9p24.1 amplification drives PD-L1/PD-L2 overexpression, which is therapeutically targetable — pembrolizumab is FDA-approved for relapsed PMBCL." },
+        { text: "Classical Hodgkin lymphoma, nodular sclerosis — CD30 positivity is diagnostic", correct: false, explanation: "While PMBCL shows weak CD30 similar to cHL, the strong CD20/CD19 positivity, strong PAX5, and CD15 negativity distinguish it from cHL. In cHL, Reed-Sternberg cells are typically CD30+, CD15+, CD20 weak/variable, PAX5 weak." },
+        { text: "Mediastinal grey zone lymphoma — mixed features require ABVD", correct: false, explanation: "MGZL has truly ambiguous features between cHL and DLBCL/PMBCL. This case has a clear B-cell phenotype (strong CD20/CD19, PAX5+, CD15−) consistent with PMBCL. MGZL should be treated with DLBCL-type regimens, not ABVD." },
+        { text: "T-cell-rich large B-cell lymphoma — treat with CHOP", correct: false, explanation: "T-cell/histiocyte-rich DLBCL has <10% neoplastic B-cells in a T-cell/histiocyte background with hepatosplenomegaly. This case shows abundant neoplastic cells with sclerosis in a mediastinal mass — classic PMBCL." }
+      ],
+      category: "PMBCL",
+      difficulty: "Advanced",
+      teachingPoint: "PMBCL IHC: CD19+, CD20+, weak CD30+, CD15−, surface Ig−, PAX5 strong. Sclerosis is hallmark. 9p24.1 amplification → PD-L1/PD-L2 overexpression → pembrolizumab in relapsed disease. Gene expression profile shares more with cHL than DLBCL. Distinguish from cHL (CD15+, CD20 weak, PAX5 weak) and MGZL (ambiguous phenotype)."
+    },
+    {
+      id: 32,
+      title: "The Post-Transplant Pathology",
+      vignette: "A renal transplant recipient, 4 years post-transplant on tacrolimus and mycophenolate, develops multiple GI tract lesions. Biopsy shows a polymorphous lymphoid infiltrate with a mixture of small and large lymphocytes, immunoblasts, and plasma cells. There is evidence of tissue destruction. EBER in-situ hybridisation shows widespread EBV positivity. The infiltrate does not fulfil criteria for any recognised lymphoma subtype.",
+      question: "What is the WHO classification of this lesion, and what distinguishes it from other PTLD categories?",
+      options: [
+        { text: "Polymorphic PTLD — destructive heterogeneous infiltrate that does not meet criteria for a specific lymphoma subtype", correct: true, explanation: "WHO classifies PTLD into 4 groups: (1) Nondestructive (plasmacytic hyperplasia, infectious mononucleosis-like, florid follicular hyperplasia), (2) Polymorphic (destructive, mixed cell types, doesn't fulfil lymphoma criteria), (3) Monomorphic (fulfils criteria for a recognised B or T-cell lymphoma), (4) cHL PTLD. This case shows a destructive polymorphous infiltrate with EBV+ but doesn't meet criteria for any specific lymphoma — classic polymorphic PTLD." },
+        { text: "Nondestructive PTLD — any EBV-positive post-transplant lymphoproliferation is nondestructive", correct: false, explanation: "Nondestructive PTLD includes plasmacytic hyperplasia, infectious mono-like, and florid follicular hyperplasia — WITHOUT tissue destruction. This case shows tissue destruction, placing it in the polymorphic category." },
+        { text: "Monomorphic PTLD — all GI tract PTLDs are monomorphic by definition", correct: false, explanation: "GI tract location does not determine PTLD subtype. Monomorphic PTLD fulfils criteria for a recognised lymphoma (e.g., DLBCL, Burkitt). This polymorphous infiltrate with mixed cell types that doesn't meet lymphoma criteria is polymorphic PTLD." },
+        { text: "EBV-positive mucocutaneous ulcer — this is a distinct entity", correct: false, explanation: "EBV-positive mucocutaneous ulcer typically presents as cutaneous or mucosal ulcers with an indolent course and responds to reduction of immunosuppression. It does not present as multiple GI masses with tissue-destructive polymorphic infiltrates." }
+      ],
+      category: "PTLD",
+      difficulty: "Advanced",
+      teachingPoint: "PTLD WHO classification: (1) Nondestructive — no tissue destruction (plasmacytic hyperplasia, IM-like, florid FH), (2) Polymorphic — destructive but doesn't fulfil lymphoma criteria, (3) Monomorphic — meets criteria for specific B/T-cell lymphoma or plasma cell neoplasm, (4) cHL PTLD. EBV status is assessed at diagnosis. Indolent small B-cell lymphomas (except EBV+ MZL) are NOT considered PTLD."
+    },
+    {
+      id: 33,
+      title: "The CD5-Positive Large B-Cell Dilemma",
+      vignette: "A 70-year-old woman presents with generalised lymphadenopathy and bone marrow involvement. Lymph node biopsy shows large cells with a diffuse pattern. IHC: CD20+, CD5+, CD10−, CD23−, BCL6+, MUM1+, cyclin D1 NEGATIVE. Ki-67 is 60%. FISH is negative for t(11;14) and MYC rearrangements.",
+      question: "What is the key immunohistochemical finding that distinguishes this diagnosis from blastoid MCL?",
+      options: [
+        { text: "Cyclin D1 negativity with absent t(11;14) — rules out MCL and supports CD5+ DLBCL", correct: true, explanation: "CD5 expression occurs in approximately 10% of DLBCL cases and can mimic blastoid MCL. The critical distinction is cyclin D1: MCL is virtually always cyclin D1+ with t(11;14), while CD5+ DLBCL is cyclin D1 negative. This case shows CD5+ large B-cells but negative cyclin D1 and no t(11;14), confirming CD5+ DLBCL. CD5+ DLBCL tends to have worse prognosis than CD5− DLBCL." },
+        { text: "CD23 negativity — this proves it is MCL", correct: false, explanation: "Both MCL and CD5+ DLBCL can be CD23 negative. CD23 negativity helps distinguish MCL from CLL (which is CD23+), but does not distinguish between MCL and CD5+ DLBCL. Cyclin D1/t(11;14) status is the definitive differentiator." },
+        { text: "Ki-67 of 60% — this is too high for DLBCL and indicates MCL", correct: false, explanation: "Ki-67 of 60% is common in DLBCL. Blastoid MCL can have Ki-67 >30%, but Ki-67 alone cannot distinguish between MCL and DLBCL. Cyclin D1 and FISH for t(11;14) are the definitive tests." },
+        { text: "BCL6 positivity — this excludes MCL and confirms follicular lymphoma origin", correct: false, explanation: "While BCL6 is more common in DLBCL, it does not exclude MCL. BCL6 positivity supports a DLBCL diagnosis but is not the definitive differentiator — cyclin D1 and t(11;14) status are the gold standard for excluding MCL." }
+      ],
+      category: "DLBCL",
+      difficulty: "Advanced",
+      teachingPoint: "CD5+ DLBCL (10% of DLBCL): Must distinguish from blastoid MCL. KEY differentiator: MCL = cyclin D1+ and t(11;14)+; CD5+ DLBCL = cyclin D1− and t(11;14)−. CD23 negativity does NOT distinguish them (both can be CD23−). CD5+ DLBCL has worse prognosis than CD5− DLBCL. Always test cyclin D1 and FISH for t(11;14) when CD5 is positive in large B-cell lymphoma."
+    },
+    {
+      id: 34,
+      title: "The PCNSL Immunophenotype",
+      vignette: "A 65-year-old immunocompetent woman presents with progressive cognitive decline and personality changes. MRI shows a solitary ring-enhancing lesion in the corpus callosum crossing the midline. No steroids have been given. Stereotactic biopsy shows sheets of large lymphoid cells in a perivascular pattern. IHC: CD20+, CD10−, BCL6+, MUM1+, CD79B mutation detected on NGS, MYD88 L265P mutation positive.",
+      question: "What molecular features of this tumour are characteristic of PCNSL and distinguish it from systemic DLBCL?",
+      options: [
+        { text: "CD79B and MYD88 mutations are frequently co-occurring in PCNSL (ABC subtype) — these are hallmarks of the unique molecular pathogenesis", correct: true, explanation: "95% of PCNSL are DLBCL, typically ABC subtype. Mutations in CD79B, MYD88 (especially L265P), and PIM1 are frequently observed and represent the unique molecular signature of PCNSL. The non-GCB/ABC phenotype (CD10−, BCL6+, MUM1+) is typical. These mutations activate the NF-κB and JAK-STAT pathways, which may have therapeutic implications (ibrutinib, lenalidomide, PD-1 inhibitors)." },
+        { text: "GCB phenotype with BCL2 rearrangement is the hallmark of PCNSL", correct: false, explanation: "PCNSL is predominantly ABC/non-GCB subtype, NOT GCB. BCL2 rearrangement is not a hallmark of PCNSL. The characteristic molecular features are CD79B, MYD88, and PIM1 mutations." },
+        { text: "TP53 mutation is the defining molecular feature of PCNSL", correct: false, explanation: "While TP53 mutations can occur in PCNSL, they are not the defining feature. CD79B, MYD88, and PIM1 mutations are the most characteristic molecular abnormalities of PCNSL, reflecting its ABC-type origin." },
+        { text: "EBV positivity is required for PCNSL diagnosis in immunocompetent patients", correct: false, explanation: "EBV-associated PCNSL occurs primarily in immunocompromised patients (HIV, post-transplant). In immunocompetent patients, PCNSL is typically EBV-negative. This case correctly shows EBV is not mentioned as the patient is immunocompetent." }
+      ],
+      category: "CNS Lymphoma",
+      difficulty: "Advanced",
+      teachingPoint: "PCNSL molecular signature: 95% DLBCL, predominantly ABC subtype. Hallmark mutations: CD79B, MYD88 (L265P), PIM1. These activate NF-κB/JAK-STAT pathways. Immunocompetent PCNSL is typically EBV-negative. Stereotactic biopsy is preferred; withhold steroids to preserve diagnostic yield. Always do contrast MRI + CSF analysis + slit-lamp examination."
+    },
+    {
+      id: 35,
+      title: "The High-Grade NOS Puzzle",
+      vignette: "A 48-year-old man presents with a rapidly growing abdominal mass. Biopsy shows a B-cell lymphoma with morphological features intermediate between DLBCL and Burkitt lymphoma — some areas show large pleomorphic cells (DLBCL-like) while other areas show medium-sized monomorphic cells with starry sky pattern (Burkitt-like). Ki-67 is 80%. IHC: CD20+, CD10+, BCL6+. FISH is performed: MYC rearrangement NEGATIVE, BCL2 rearrangement NEGATIVE, BCL6 rearrangement NEGATIVE.",
+      question: "What is the correct WHO-HAEM5 classification, and how does the absence of MYC/BCL2 rearrangements affect classification?",
+      options: [
+        { text: "High-grade B-cell lymphoma, NOS — intermediate features without MYC/BCL2 rearrangements create this distinct entity", correct: true, explanation: "In WHO-HAEM5, B-cell lymphomas with morphologic features intermediate between DLBCL and BL are classified as: (1) High-grade B-cell lymphoma with MYC and BCL2 rearrangements (if FISH confirms both = DHL), or (2) High-grade B-cell lymphoma, NOS (if rearrangements are absent). This case shows intermediate morphology without targetable rearrangements, making it HGBCL-NOS. Prognosis and management remain undefined, but intensive strategies (e.g., DA-EPOCH-R) are preferred based on high-risk histology." },
+        { text: "DLBCL-NOS — if FISH is negative, it defaults to DLBCL regardless of morphology", correct: false, explanation: "The presence of intermediate Burkitt-like morphology prevents classification as standard DLBCL-NOS. WHO-HAEM5 specifically created the HGBCL-NOS category for these cases. Morphology matters — these tumours have distinct biology from typical DLBCL." },
+        { text: "Burkitt lymphoma — Ki-67 of 80% is sufficient for diagnosis", correct: false, explanation: "Burkitt lymphoma requires Ki-67 ~100%, cMYC translocation, and classic monomorphic medium-cell morphology. This case has Ki-67 80% (not ~100%), mixed morphology, and no MYC rearrangement — insufficient for Burkitt diagnosis." },
+        { text: "Double-hit lymphoma — the intermediate morphology defines double-hit regardless of FISH", correct: false, explanation: "Double-hit lymphoma REQUIRES FISH-confirmed MYC AND BCL2 (and/or BCL6) gene rearrangements. Without these rearrangements, the diagnosis is HGBCL-NOS, not DHL. The term 'double-hit' refers specifically to the cytogenetic findings, not morphology." }
+      ],
+      category: "DHL",
+      difficulty: "Advanced",
+      teachingPoint: "WHO-HAEM5 classification of aggressive B-cell lymphomas: (1) DLBCL-NOS — typical large cell morphology, (2) Burkitt — monomorphic medium cells, Ki-67 ~100%, cMYC translocation, (3) HGBCL with MYC/BCL2 = DHL, (4) HGBCL-NOS = intermediate features WITHOUT rearrangements. Management of HGBCL-NOS is undefined; most specialists favour intensive DA-EPOCH-R. With DHLs excluded, prognosis may be better than originally described."
+    },
+    {
+      id: 36,
+      title: "The Flow Cytometry Puzzle",
+      vignette: "A 58-year-old man presents with a peripheral lymphocytosis of 25 × 10⁹/L, mild splenomegaly, and no lymphadenopathy. Flow cytometry of peripheral blood shows: κ-restricted B-cell population, CD5+, CD19+, CD20 bright, FMC7+, CD43+, CD23−, CD10−, CD200 negative. Bone marrow biopsy confirms involvement. The haematologist orders an IHC panel on the bone marrow trephine: cyclin D1 is POSITIVE, SOX11 is NEGATIVE. Ki-67 is 5%.",
+      question: "What is the diagnosis, and what critical management decision does the SOX11/Ki-67 pattern inform?",
+      options: [
+        { text: "Indolent (leukemic non-nodal) MCL — SOX11 negative with low Ki-67 supports observation rather than immediate treatment", correct: true, explanation: "This is the indolent variant of MCL: leukemic non-nodal presentation (peripheral blood/bone marrow involvement WITHOUT lymphadenopathy), SOX11 negative, low Ki-67 (5%), derived from post-germinal centre B cells. Despite cyclin D1 positivity confirming MCL, the SOX11-negative/low Ki-67 pattern identifies the indolent variant where observation is appropriate. These patients may have a prolonged indolent course similar to CLL watch-and-wait." },
+        { text: "CLL — CD5+ B-cell lymphocytosis with splenomegaly is always CLL", correct: false, explanation: "CLL is typically CD5+, CD23+, CD200+, FMC7−, with dim CD20. This case shows CD23−, CD200−, FMC7+, bright CD20 — all features favouring MCL over CLL. Cyclin D1 positivity confirms MCL. The flow cytometry pattern is critical for distinguishing these entities." },
+        { text: "Blastoid MCL requiring immediate intensive chemotherapy + ASCT", correct: false, explanation: "Blastoid MCL has large cells with blastoid morphology, HIGH Ki-67 (>30%), and often TP53 mutations. This case has low Ki-67 (5%) and SOX11 negativity — the exact opposite pattern. This is indolent MCL where observation is appropriate." },
+        { text: "Splenic marginal zone lymphoma — CD5 positivity is irrelevant", correct: false, explanation: "SMZL is typically CD5 negative. While splenomegaly can occur in both, cyclin D1 positivity and t(11;14) are definitive for MCL. The flow cytometry pattern (CD5+, CD23−, FMC7+) further supports MCL." }
+      ],
+      category: "MCL",
+      difficulty: "Advanced",
+      teachingPoint: "Indolent MCL diagnostic criteria: (1) Leukemic non-nodal presentation, (2) SOX11 negative, (3) Low Ki-67 (≤10%), (4) Post-GC B-cell derivation. Flow cytometry distinguishes from CLL: MCL = CD5+, CD23−, FMC7+, bright CD20, CD200−; CLL = CD5+, CD23+, FMC7−, dim CD20, CD200+. Cyclin D1/t(11;14) confirms MCL. Observation is appropriate for indolent variant."
     }
   ],
   quickFireQuestions: [
@@ -451,7 +602,157 @@ export const GAME_DATA = {
     { q: "In the POLARIX trial, which DLBCL subgroup benefited most from Pola-R-CHP?", a: "ABC subtype with IPI ≥2", options: ["GCB subtype with IPI 0-1", "ABC subtype with IPI ≥2", "All DLBCL equally", "Double-hit lymphoma"] },
     { q: "What CD4 threshold makes rituximab safe in HIV-associated lymphoma?", a: ">50/mm³", options: [">50/mm³", ">100/mm³", ">200/mm³", ">350/mm³"] },
     { q: "What percentage of PMBCL patients needed RT after DA-EPOCH-R in the NIH trial?", a: "~4% (2/51)", options: ["~4% (2/51)", "~15%", "~30%", "~50%"] },
-    { q: "What trial showed ASCT superiority over etoposide/cytarabine for PCNSL consolidation?", a: "CALGB 51101", options: ["IELSG32", "CALGB 51101", "POLARIX", "CORAL"] }
+    { q: "What trial showed ASCT superiority over etoposide/cytarabine for PCNSL consolidation?", a: "CALGB 51101", options: ["IELSG32", "CALGB 51101", "POLARIX", "CORAL"] },
+    /* ── DIAGNOSTIC PATHOLOGY Quick-Fire ── */
+    { q: "What IHC panel defines the Hans algorithm?", a: "CD10, BCL6, IRF4/MUM1", options: ["CD5, CD23, CD200", "CD10, BCL6, IRF4/MUM1", "CD20, CD79a, PAX5", "CD3, CD5, CD7"] },
+    { q: "What percentage of DLBCL cases express CD5?", a: "~10%", options: ["~1%", "~10%", "~30%", "~50%"] },
+    { q: "BCL2 is typically NEGATIVE in which aggressive lymphoma?", a: "Burkitt lymphoma", options: ["DLBCL", "MCL", "Burkitt lymphoma", "PMBCL"] },
+    { q: "What is the sensitivity of the Hans algorithm for classifying GCB subtype?", a: "71%", options: ["50%", "71%", "88%", "95%"] },
+    { q: "What assay determines cell-of-origin from FFPE tissue with high accuracy?", a: "Lymph2Cx", options: ["Hans algorithm IHC", "Lymph2Cx", "Gene expression microarray", "Next-gen sequencing"] },
+    { q: "In the WHO-HAEM5, what defines high-grade B-cell lymphoma vs HGBCL-NOS?", a: "Presence vs absence of MYC/BCL2 rearrangements by FISH", options: ["Ki-67 >90% vs <90%", "Presence vs absence of MYC/BCL2 rearrangements by FISH", "GCB vs ABC subtype", "CD10 positive vs negative"] },
+    { q: "What staining pattern distinguishes CLL from MCL on flow cytometry?", a: "CLL: CD23+, dim CD20, CD200+; MCL: CD23−, bright CD20, CD200−", options: ["CLL: CD23+, dim CD20, CD200+; MCL: CD23−, bright CD20, CD200−", "CLL: CD5−; MCL: CD5+", "CLL: FMC7+; MCL: FMC7−", "CLL: cyclin D1+; MCL: cyclin D1−"] },
+    { q: "What histological feature of PMBCL is a hallmark finding?", a: "Compartmentalising fibrosis/sclerosis", options: ["Starry sky pattern", "Compartmentalising fibrosis/sclerosis", "Hodgkin-like Reed-Sternberg cells", "Notched nuclei"] },
+    { q: "What IHC marker is virtually always positive in MCL but negative in CLL?", a: "Cyclin D1", options: ["CD5", "CD23", "Cyclin D1", "CD20"] },
+    { q: "What percentage of neoplastic B-cells defines T-cell/histiocyte-rich DLBCL?", a: "<10%", options: ["<10%", "<25%", "<50%", ">50%"] },
+    { q: "EBV-positive mucocutaneous ulcer responds to what initial treatment?", a: "Reduction of immunosuppression", options: ["R-CHOP", "Reduction of immunosuppression", "WBRT", "Antiviral therapy"] },
+    { q: "What is the typical CD15 status in PMBCL vs classical Hodgkin lymphoma?", a: "PMBCL: CD15−; cHL: CD15+", options: ["Both CD15+", "PMBCL: CD15−; cHL: CD15+", "Both CD15−", "PMBCL: CD15+; cHL: CD15−"] },
+    { q: "What morphological feature of Burkitt cells is seen on Wright-Giemsa stain?", a: "Cytoplasmic lipid vacuoles", options: ["Bilobed nuclei", "Auer rods", "Cytoplasmic lipid vacuoles", "Hairy projections"] },
+    { q: "What SOX11 status characterises indolent MCL?", a: "SOX11 negative", options: ["SOX11 positive", "SOX11 negative", "SOX11 not expressed in MCL", "SOX11 variable"] },
+    { q: "Which gene mutation (L265P) is a hallmark of primary CNS lymphoma?", a: "MYD88", options: ["TP53", "MYD88", "BRAF", "NOTCH1"] }
+  ],
+  emqSets: [
+    {
+      id: 1,
+      theme: "Lymphoma Diagnosis by IHC Pattern",
+      instruction: "For each clinical scenario, select the MOST LIKELY diagnosis from the option list below.",
+      optionList: [
+        "A. Diffuse large B-cell lymphoma, GCB subtype",
+        "B. Diffuse large B-cell lymphoma, ABC/non-GCB subtype",
+        "C. Primary mediastinal large B-cell lymphoma",
+        "D. Burkitt lymphoma",
+        "E. Mantle cell lymphoma, classical",
+        "F. Mantle cell lymphoma, blastoid variant",
+        "G. High-grade B-cell lymphoma with MYC and BCL2 rearrangements (DHL)",
+        "H. High-grade B-cell lymphoma, NOS",
+        "I. T-cell/histiocyte-rich large B-cell lymphoma",
+        "J. Primary CNS lymphoma"
+      ],
+      stems: [
+        {
+          stem: "Large B-cells, CD20+, CD10+, BCL6+, MUM1−. FISH negative for MYC and BCL2 rearrangements. Ki-67 50%.",
+          correctAnswer: "A",
+          explanation: "CD10+ by Hans algorithm = GCB subtype. No rearrangements by FISH rules out DHL. Standard DLBCL, GCB subtype."
+        },
+        {
+          stem: "Medium-sized monomorphic cells, 'starry sky' pattern, Ki-67 ~100%, CD20+, CD10+, BCL6+, BCL2−. FISH: t(8;14) positive.",
+          correctAnswer: "D",
+          explanation: "Classic Burkitt: medium cells, Ki-67 ~100%, starry sky, t(8;14). BCL2 negativity helps distinguish from DHL."
+        },
+        {
+          stem: "Large B-cells, CD20+, CD10−, BCL6+, MUM1+. MYC protein 70% positive, BCL2 protein 90%. FISH: MYC AND BCL2 rearrangements confirmed.",
+          correctAnswer: "G",
+          explanation: "IHC shows double expressor pattern, but FISH confirms actual MYC AND BCL2 rearrangements = double-hit lymphoma (high-grade B-cell lymphoma with MYC/BCL2 in WHO-HAEM5)."
+        },
+        {
+          stem: "Small-to-medium lymphocytes, CD5+, CD20+, CD10−, CD23−, cyclin D1+. t(11;14) confirmed. Ki-67 85%, blastoid morphology.",
+          correctAnswer: "F",
+          explanation: "Cyclin D1+/t(11;14) = MCL. Ki-67 85% with blastoid morphology defines blastoid variant — most aggressive MCL subtype."
+        },
+        {
+          stem: "Scattered large B-cells (<10% of cells), CD20+, CD79a+, in a background dominated by CD3+ T-cells and CD68+ histiocytes. Hepatosplenomegaly and bone marrow involvement.",
+          correctAnswer: "I",
+          explanation: "Sparse neoplastic B-cells (<10%) in T-cell/histiocyte-rich background with advanced-stage presentation = T-cell/histiocyte-rich large B-cell lymphoma."
+        }
+      ]
+    },
+    {
+      id: 2,
+      theme: "Cytogenetic Abnormalities in Aggressive Lymphomas",
+      instruction: "Match each cytogenetic finding with the lymphoma subtype it is MOST characteristically associated with.",
+      optionList: [
+        "A. Burkitt lymphoma",
+        "B. Mantle cell lymphoma",
+        "C. Follicular lymphoma",
+        "D. High-grade B-cell lymphoma (DHL)",
+        "E. DLBCL-NOS",
+        "F. Primary mediastinal large B-cell lymphoma",
+        "G. ALK-positive anaplastic large cell lymphoma",
+        "H. Marginal zone lymphoma",
+        "I. CLL/SLL",
+        "J. Hairy cell leukaemia"
+      ],
+      stems: [
+        {
+          stem: "t(8;14)(q24;q32) — juxtaposition of MYC and IGH",
+          correctAnswer: "A",
+          explanation: "t(8;14) is the hallmark of Burkitt lymphoma, present in ~80% of cases. Variant translocations t(2;8) and t(8;22) involve light chain loci."
+        },
+        {
+          stem: "t(11;14)(q13;q32) — leading to cyclin D1 overexpression",
+          correctAnswer: "B",
+          explanation: "t(11;14) is present in virtually all MCL cases, resulting in constitutive cyclin D1 overexpression that drives cell cycle dysregulation."
+        },
+        {
+          stem: "Concurrent MYC and BCL2 gene rearrangements confirmed by FISH",
+          correctAnswer: "D",
+          explanation: "Co-occurrence of MYC AND BCL2 rearrangements by FISH defines double-hit lymphoma, classified as high-grade B-cell lymphoma with MYC/BCL2 in WHO-HAEM5."
+        },
+        {
+          stem: "9p24.1 amplification leading to PD-L1/PD-L2 overexpression",
+          correctAnswer: "F",
+          explanation: "9p24.1 amplification is characteristic of PMBCL, driving PD-L1 overexpression. This is therapeutically targetable with checkpoint inhibitors in relapsed disease."
+        },
+        {
+          stem: "t(14;18)(q32;q21) — BCL2 overexpression",
+          correctAnswer: "C",
+          explanation: "t(14;18) is the hallmark of follicular lymphoma, present in ~85% of cases. It causes BCL2 overexpression, preventing apoptosis."
+        }
+      ]
+    },
+    {
+      id: 3,
+      theme: "Flow Cytometry and Immunophenotype Patterns",
+      instruction: "Match each flow cytometry/immunophenotype pattern with the MOST LIKELY diagnosis.",
+      optionList: [
+        "A. CLL/SLL",
+        "B. Mantle cell lymphoma",
+        "C. Follicular lymphoma",
+        "D. Burkitt lymphoma",
+        "E. DLBCL",
+        "F. Hairy cell leukaemia",
+        "G. Splenic marginal zone lymphoma",
+        "H. Primary mediastinal large B-cell lymphoma",
+        "I. Indolent (leukemic non-nodal) MCL",
+        "J. Lymphoplasmacytic lymphoma"
+      ],
+      stems: [
+        {
+          stem: "CD5+, CD19+, CD20 bright, CD23−, FMC7+, CD43+, CD200−, cyclin D1+, SOX11+. Ki-67 40%.",
+          correctAnswer: "B",
+          explanation: "CD5+/CD23−/FMC7+/CD200−/bright CD20 with cyclin D1+ and SOX11+ = classical MCL. The high Ki-67 (40%) indicates typical/aggressive rather than indolent variant."
+        },
+        {
+          stem: "CD5+, CD19+, CD20 dim, CD23+, FMC7−, CD43+, CD200+, cyclin D1 negative.",
+          correctAnswer: "A",
+          explanation: "CD5+/CD23+/FMC7−/dim CD20/CD200+ = CLL/SLL. This is the classic CLL immunophenotype, distinct from MCL by CD23 positivity, CD200 positivity, and dim CD20."
+        },
+        {
+          stem: "CD5+, CD19+, CD20 bright, CD23−, FMC7+, cyclin D1+, SOX11 NEGATIVE. Ki-67 5%. No lymphadenopathy, peripheral blood lymphocytosis with splenomegaly.",
+          correctAnswer: "I",
+          explanation: "MCL confirmed by cyclin D1+, but SOX11 negative with low Ki-67 (5%) and leukemic non-nodal presentation = indolent MCL variant. Observation is appropriate."
+        },
+        {
+          stem: "CD19+, CD20+, CD10+, BCL6+, surface Ig+, high forward/side scatter, Ki-67 ~100%.",
+          correctAnswer: "D",
+          explanation: "CD10+/BCL6+ with Ki-67 ~100% and high scatter (large/blast-like cells) = Burkitt lymphoma. The extremely high proliferative index is the key distinguishing feature."
+        },
+        {
+          stem: "CD19+, CD20+, weak CD30+, surface Ig NEGATIVE, CD10−. Young woman with anterior mediastinal mass.",
+          correctAnswer: "H",
+          explanation: "Surface Ig negative, weak CD30+, CD20+ in a young woman with mediastinal mass = PMBCL. Absence of surface Ig and weak CD30 are hallmarks distinguishing it from other B-cell lymphomas."
+        }
+      ]
+    }
   ]
 };
 

@@ -705,6 +705,13 @@ export default function App() {
   const [showConfetti, setShowConfetti] = useState(false);
   const contentRef = useRef(null);
 
+  // EMQ states
+  const [emqSetIdx, setEmqSetIdx] = useState(0);
+  const [emqStemIdx, setEmqStemIdx] = useState(0);
+  const [emqAnswer, setEmqAnswer] = useState(null);
+  const [emqScore, setEmqScore] = useState({ correct: 0, total: 0 });
+  const [emqHistory, setEmqHistory] = useState([]);
+
   // Theme state
   const [theme, setTheme] = useState(() => {
     try { return localStorage.getItem('lymphoma-theme') || 'dark'; }
@@ -768,7 +775,7 @@ export default function App() {
   // Scroll to top on navigation
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [mode, scenarioIdx, quizIdx, gameComplete]);
+  }, [mode, scenarioIdx, quizIdx, emqSetIdx, emqStemIdx, gameComplete]);
 
   const startScenarios = useCallback(() => {
     const s = shuffleArray(GAME_DATA.clinicalScenarios);
@@ -800,6 +807,19 @@ export default function App() {
     setEarnedXP(0);
     setSpeedAnswers([]);
     setMode('quickfire');
+  }, []);
+
+  const startEMQ = useCallback(() => {
+    setEmqSetIdx(0);
+    setEmqStemIdx(0);
+    setEmqAnswer(null);
+    setEmqScore({ correct: 0, total: 0 });
+    setEmqHistory([]);
+    setGameComplete(false);
+    setShowConfetti(false);
+    setStreak(0);
+    setEarnedXP(0);
+    setMode('emq');
   }, []);
 
   const handleScenarioAnswer = (idx) => {
@@ -911,6 +931,58 @@ export default function App() {
     setTimerActive(true);
   };
 
+  const handleEMQAnswer = (letter) => {
+    if (emqAnswer !== null) return;
+    setEmqAnswer(letter);
+    const currentSet = GAME_DATA.emqSets[emqSetIdx];
+    const currentStem = currentSet.stems[emqStemIdx];
+    const isCorrect = letter === currentStem.correctAnswer;
+    setEmqScore(s => ({ correct: s.correct + (isCorrect ? 1 : 0), total: s.total + 1 }));
+    setEmqHistory(h => [...h, {
+      set: currentSet.theme,
+      stem: currentStem.stem.substring(0, 60) + '...',
+      correct: isCorrect,
+      selected: letter,
+      correctAnswer: currentStem.correctAnswer,
+    }]);
+
+    if (isCorrect) {
+      const newStreak = streak + 1;
+      setStreak(newStreak);
+      addXP(75 + (newStreak > 1 ? 25 : 0));
+      if (emqScore.total === 0 && emqScore.correct === 0) {
+        unlockAchievement('first_blood');
+      }
+    } else {
+      setStreak(0);
+    }
+  };
+
+  const nextEMQStem = () => {
+    const currentSet = GAME_DATA.emqSets[emqSetIdx];
+    if (emqStemIdx + 1 < currentSet.stems.length) {
+      setEmqStemIdx(i => i + 1);
+      setEmqAnswer(null);
+    } else if (emqSetIdx + 1 < GAME_DATA.emqSets.length) {
+      setEmqSetIdx(i => i + 1);
+      setEmqStemIdx(0);
+      setEmqAnswer(null);
+    } else {
+      setGameComplete(true);
+      const totalStems = GAME_DATA.emqSets.reduce((acc, s) => acc + s.stems.length, 0);
+      if (emqScore.correct >= Math.ceil(totalStems * 0.6)) {
+        setShowConfetti(true);
+        setTimeout(() => setShowConfetti(false), 5000);
+      }
+      if (emqScore.correct === totalStems) {
+        unlockAchievement('master_diagnostician');
+      }
+      if ((emqScore.correct / totalStems) * 100 >= 80) {
+        unlockAchievement('lymphoma_expert');
+      }
+    }
+  };
+
   /* ─── MENU ─── */
   if (mode === 'menu') {
     const unlockedCount = unlockedAchievements.length;
@@ -1003,7 +1075,7 @@ export default function App() {
                   <div style={{ flex: 1 }}>
                     <h2 style={{ margin: '0 0 8px', fontSize: 20, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: -0.3 }}>Clinical Scenarios</h2>
                     <p style={{ margin: '0 0 16px', color: 'var(--text-secondary)', fontSize: 13, lineHeight: 1.65 }}>
-                      26 case-based vignettes with real clinical decisions. Diagnose, classify, and treat patients with aggressive B-cell lymphomas.
+                      36 case-based vignettes with real clinical decisions. Diagnose, classify, and treat patients with aggressive B-cell lymphomas.
                     </p>
                     <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                       {['DLBCL', 'Burkitt', 'MCL', 'PMBCL', 'DHL', 'PTLD', 'MGZL'].map(c => (
@@ -1054,7 +1126,7 @@ export default function App() {
                   <div style={{ flex: 1 }}>
                     <h2 style={{ margin: '0 0 8px', fontSize: 20, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: -0.3 }}>Quick-Fire Quiz</h2>
                     <p style={{ margin: '0 0 16px', color: 'var(--text-secondary)', fontSize: 13, lineHeight: 1.65 }}>
-                      15 rapid-fire questions from a pool of 50+ with a 15-second timer. Test your recall on key facts, landmark trials, and classifications.
+                      15 rapid-fire questions from a pool of 65+ with a 15-second timer. Test your recall on key facts, landmark trials, and classifications.
                     </p>
                     <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
                       <span style={{
@@ -1074,10 +1146,75 @@ export default function App() {
                   }}>&rarr;</div>
                 </div>
               </button>
+
+              {/* EMQ Mode */}
+              <button onClick={startEMQ} className="animate-fadeInUp stagger-4" style={{
+                background: 'var(--bg-card)',
+                border: '1px solid rgba(72,187,120,0.25)',
+                borderRadius: 20, padding: '30px 30px',
+                cursor: 'pointer', textAlign: 'left',
+                transition: 'all 0.4s cubic-bezier(0.22,1,0.36,1)',
+                boxShadow: 'var(--card-shadow)',
+                fontFamily: 'var(--font-sans)',
+                backdropFilter: 'blur(16px)',
+                WebkitBackdropFilter: 'blur(16px)',
+                position: 'relative',
+                overflow: 'hidden',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.transform = 'translateY(-4px) scale(1.01)';
+                e.currentTarget.style.boxShadow = '0 20px 60px rgba(72,187,120,0.15)';
+                e.currentTarget.style.borderColor = 'rgba(72,187,120,0.5)';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.transform = '';
+                e.currentTarget.style.boxShadow = 'var(--card-shadow)';
+                e.currentTarget.style.borderColor = 'rgba(72,187,120,0.25)';
+              }}
+              >
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 20 }}>
+                  <div style={{
+                    width: 56, height: 56, borderRadius: 16, flexShrink: 0,
+                    background: 'rgba(72,187,120,0.12)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 28,
+                    border: '1px solid rgba(72,187,120,0.1)',
+                  }}>🔬</div>
+                  <div style={{ flex: 1 }}>
+                    <h2 style={{ margin: '0 0 8px', fontSize: 20, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: -0.3 }}>
+                      EMQ Challenge
+                      <span style={{
+                        marginLeft: 10, fontSize: 10, fontWeight: 700,
+                        background: 'linear-gradient(135deg, #48bb78, #38a169)',
+                        color: '#fff', padding: '2px 8px', borderRadius: 6,
+                        verticalAlign: 'middle',
+                      }}>NEW</span>
+                    </h2>
+                    <p style={{ margin: '0 0 16px', color: 'var(--text-secondary)', fontSize: 13, lineHeight: 1.65 }}>
+                      Extended Matching Questions — match diagnostic patterns to lymphoma subtypes. 3 themed sets covering IHC, cytogenetics, and flow cytometry.
+                    </p>
+                    <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                      <span style={{
+                        color: '#48bb78', fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5,
+                        background: 'rgba(72,187,120,0.08)', padding: '4px 10px', borderRadius: 8,
+                        border: '1px solid rgba(72,187,120,0.12)',
+                      }}>
+                        <span style={{ fontSize: 14 }}>🧬</span> Pathology focused
+                      </span>
+                      <span style={{ color: 'var(--text-dimmed)' }}>&middot;</span>
+                      <span style={{ color: 'var(--text-muted)', fontSize: 12, fontWeight: 500 }}>15 stems &middot; 3 sets</span>
+                    </div>
+                  </div>
+                  <div style={{
+                    color: 'var(--text-dimmed)', fontSize: 22, flexShrink: 0, alignSelf: 'center',
+                    transition: 'transform 0.3s, color 0.3s',
+                  }}>&rarr;</div>
+                </div>
+              </button>
             </div>
 
             {/* Stats overview */}
-            <div className="animate-fadeInUp stagger-4" style={{
+            <div className="animate-fadeInUp stagger-5" style={{
               display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14,
               marginBottom: 24,
             }}>
@@ -1102,7 +1239,7 @@ export default function App() {
                 <div style={{
                   fontSize: 24, fontWeight: 800, color: 'var(--stat-num-1)',
                   fontFamily: 'var(--font-mono)',
-                }}>26</div>
+                }}>36</div>
                 <div style={{
                   fontSize: 10, color: 'var(--text-muted)', fontWeight: 600,
                   letterSpacing: 0.6, textTransform: 'uppercase', marginTop: 4,
@@ -1130,7 +1267,7 @@ export default function App() {
                 <div style={{
                   fontSize: 24, fontWeight: 800, color: 'var(--stat-num-2)',
                   fontFamily: 'var(--font-mono)',
-                }}>50+</div>
+                }}>65+</div>
                 <div style={{
                   fontSize: 10, color: 'var(--text-muted)', fontWeight: 600,
                   letterSpacing: 0.6, textTransform: 'uppercase', marginTop: 4,
@@ -1195,7 +1332,7 @@ export default function App() {
             </div>
 
             {/* Achievements Gallery */}
-            <div className="animate-fadeInUp stagger-5" style={{
+            <div className="animate-fadeInUp stagger-6" style={{
               background: 'var(--bg-card)',
               borderRadius: 20,
               padding: '28px',
@@ -1932,6 +2069,291 @@ export default function App() {
                 </button>
               </div>
             )}
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  /* ─── EMQ RESULTS ─── */
+  if (mode === 'emq' && gameComplete) {
+    const totalStems = GAME_DATA.emqSets.reduce((acc, s) => acc + s.stems.length, 0);
+    const pct = Math.round((emqScore.correct / totalStems) * 100);
+    const passed = emqScore.correct >= Math.ceil(totalStems * 0.6);
+
+    return (
+      <>
+        <div className="app-bg" />
+        <div className="app-bg-extra" />
+        <div className="histology-bg" />
+        <div className="grid-overlay" />
+        <div className="app-content">
+          {achievementToast && <AchievementToast achievement={achievementToast} onClose={() => setAchievementToast(null)} />}
+          <Confetti active={showConfetti} />
+          <Navbar showBack onBack={() => setMode('menu')} theme={theme} onThemeToggle={toggleTheme} xp={xp} />
+          <div style={{ maxWidth: 680, margin: '0 auto', padding: '48px 20px' }}>
+            <div className="animate-scaleIn" style={{ textAlign: 'center', marginBottom: 40 }}>
+              <TrophyDisplay score={emqScore} />
+              <h2 style={{
+                fontSize: 30, fontWeight: 900, margin: '0 0 8px',
+                background: passed ? 'linear-gradient(135deg, #48bb78, #68d391)' : 'linear-gradient(135deg, #f6ad55, #ed8936)',
+                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+                letterSpacing: -0.5,
+              }}>{passed ? 'Pathology Expert!' : 'Review Time!'}</h2>
+              <GradientDivider style={{ maxWidth: 100, margin: '16px auto 24px' }} />
+              <div style={{ display: 'inline-block' }}>
+                <ScoreDisplay correct={emqScore.correct} total={totalStems} label="EMQ Stems" streak={streak} />
+              </div>
+
+              {/* XP Summary */}
+              <div style={{
+                marginTop: 28, background: 'var(--bg-card)', borderRadius: 16, padding: '20px',
+                border: '1px solid var(--border-card)', backdropFilter: 'blur(12px)', maxWidth: 400, margin: '28px auto 0',
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: 24 }}>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: 20, fontWeight: 800, color: '#f6ad55' }}>+{earnedXP}</div>
+                    <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600, marginTop: 2 }}>XP EARNED</div>
+                  </div>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: 20, fontWeight: 800, color: '#b794f4' }}>Lv {getLevel(xp)}</div>
+                    <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600, marginTop: 2 }}>CURRENT LEVEL</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* EMQ Results by Set */}
+            <div className="animate-fadeInUp stagger-2" style={{ marginBottom: 28 }}>
+              {GAME_DATA.emqSets.map((set, setI) => (
+                <div key={set.id} style={{
+                  background: 'var(--bg-card)', borderRadius: 16, padding: '20px', marginBottom: 14,
+                  border: '1px solid var(--border-card)', backdropFilter: 'blur(12px)',
+                }}>
+                  <h4 style={{ margin: '0 0 12px', fontSize: 14, fontWeight: 700, color: '#48bb78' }}>
+                    🧬 Set {setI + 1}: {set.theme}
+                  </h4>
+                  {set.stems.map((stem, stemI) => {
+                    const historyItem = emqHistory[setI * 5 + stemI];
+                    if (!historyItem) return null;
+                    return (
+                      <div key={stemI} style={{
+                        display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0',
+                        borderTop: stemI > 0 ? '1px solid var(--border-subtle)' : 'none',
+                      }}>
+                        <span style={{ fontSize: 16 }}>{historyItem.correct ? '✅' : '❌'}</span>
+                        <span style={{ fontSize: 12, color: 'var(--text-secondary)', flex: 1 }}>
+                          {stem.stem.substring(0, 80)}...
+                        </span>
+                        {!historyItem.correct && (
+                          <span style={{ fontSize: 11, color: '#48bb78', fontWeight: 700 }}>
+                            Ans: {historyItem.correctAnswer}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+
+            <div className="animate-fadeInUp stagger-3" style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
+              <button onClick={startEMQ} style={{
+                background: 'linear-gradient(135deg, #48bb78, #38a169)', color: '#fff',
+                border: 'none', borderRadius: 14, padding: '16px 36px', fontWeight: 700,
+                fontSize: 15, cursor: 'pointer', transition: 'all 0.3s ease',
+                boxShadow: '0 4px 20px rgba(72,187,120,0.3)',
+              }}
+              onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
+              onMouseLeave={e => e.currentTarget.style.transform = ''}
+              >🔬 Retry EMQs</button>
+              <button onClick={() => setMode('menu')} style={{
+                background: 'var(--glass-bg)', color: 'var(--text-primary)',
+                border: '1px solid var(--border-subtle)', borderRadius: 14,
+                padding: '16px 36px', fontWeight: 700, fontSize: 15,
+                cursor: 'pointer', transition: 'all 0.3s ease',
+                backdropFilter: 'blur(12px)',
+              }}
+              onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--btn-secondary-border-hover)'}
+              onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border-subtle)'}
+              >🏠 Menu</button>
+            </div>
+            <Footer />
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  /* ─── EMQ PLAYING ─── */
+  if (mode === 'emq') {
+    const currentSet = GAME_DATA.emqSets[emqSetIdx];
+    const currentStem = currentSet.stems[emqStemIdx];
+    const totalStemsCompleted = GAME_DATA.emqSets.slice(0, emqSetIdx).reduce((acc, s) => acc + s.stems.length, 0) + emqStemIdx;
+    const totalStems = GAME_DATA.emqSets.reduce((acc, s) => acc + s.stems.length, 0);
+
+    return (
+      <>
+        <div className="app-bg" />
+        <div className="app-bg-extra" />
+        <div className="histology-bg" />
+        <div className="grid-overlay" />
+        <div className="app-content">
+          {achievementToast && <AchievementToast achievement={achievementToast} onClose={() => setAchievementToast(null)} />}
+          <Navbar showBack onBack={() => setMode('menu')} theme={theme} onThemeToggle={toggleTheme} xp={xp} />
+          <div style={{ maxWidth: 780, margin: '0 auto', padding: '32px 20px' }}>
+            {/* Progress */}
+            <div className="animate-fadeInUp" style={{ marginBottom: 24 }}>
+              <ProgressBar current={totalStemsCompleted + 1} total={totalStems} />
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 12 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{
+                    background: 'rgba(72,187,120,0.12)', border: '1px solid rgba(72,187,120,0.2)',
+                    borderRadius: 8, padding: '3px 10px', fontSize: 11, fontWeight: 700, color: '#48bb78',
+                  }}>Set {emqSetIdx + 1}/{GAME_DATA.emqSets.length}</span>
+                  <span style={{
+                    background: 'var(--bg-option)', border: '1px solid var(--border-subtle)',
+                    borderRadius: 8, padding: '3px 10px', fontSize: 11, fontWeight: 600, color: 'var(--text-secondary)',
+                  }}>Stem {emqStemIdx + 1}/{currentSet.stems.length}</span>
+                </div>
+                {streak > 1 && (
+                  <span style={{
+                    background: 'linear-gradient(135deg, rgba(246,173,85,0.15), rgba(237,137,54,0.15))',
+                    border: '1px solid rgba(246,173,85,0.3)',
+                    borderRadius: 8, padding: '3px 10px', fontSize: 11, fontWeight: 700, color: '#f6ad55',
+                  }}>🔥 {streak} streak</span>
+                )}
+              </div>
+            </div>
+
+            {/* Theme Header */}
+            <div className="animate-fadeInUp stagger-1" style={{
+              background: 'linear-gradient(135deg, rgba(72,187,120,0.08), rgba(56,161,105,0.08))',
+              border: '1px solid rgba(72,187,120,0.2)',
+              borderRadius: 16, padding: '20px 24px', marginBottom: 16,
+              backdropFilter: 'blur(12px)',
+            }}>
+              <h3 style={{ margin: '0 0 6px', fontSize: 16, fontWeight: 800, color: '#48bb78' }}>
+                🧬 {currentSet.theme}
+              </h3>
+              <p style={{ margin: 0, fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                {currentSet.instruction}
+              </p>
+            </div>
+
+            {/* Option List (always visible) */}
+            <div className="animate-fadeInUp stagger-2" style={{
+              background: 'var(--bg-card)', borderRadius: 16, padding: '16px 20px', marginBottom: 16,
+              border: '1px solid var(--border-card)', backdropFilter: 'blur(12px)',
+            }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 10, textTransform: 'uppercase', letterSpacing: 0.8 }}>
+                Option List
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 4 }}>
+                {currentSet.optionList.map((opt, i) => (
+                  <div key={i} style={{
+                    fontSize: 12, color: 'var(--text-secondary)', padding: '4px 0', lineHeight: 1.5, fontWeight: 500,
+                  }}>{opt}</div>
+                ))}
+              </div>
+            </div>
+
+            {/* Current Stem */}
+            <div className="animate-fadeInUp stagger-3" style={{
+              background: 'var(--bg-card)', borderRadius: 20, padding: '28px',
+              border: '1px solid var(--border-card)', marginBottom: 20,
+              backdropFilter: 'blur(16px)',
+            }}>
+              <p style={{
+                fontSize: 15, color: 'var(--text-primary)', lineHeight: 1.75, margin: 0, fontWeight: 500,
+              }}>{currentStem.stem}</p>
+            </div>
+
+            {/* Answer Buttons (A through J) */}
+            <div className="animate-fadeInUp stagger-4" style={{
+              display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10, marginBottom: 20,
+            }}>
+              {currentSet.optionList.map((opt, i) => {
+                const letter = opt.charAt(0);
+                const isSelected = emqAnswer === letter;
+                const isCorrect = letter === currentStem.correctAnswer;
+                const showResult = emqAnswer !== null;
+
+                let bg = 'var(--bg-option)';
+                let borderColor = 'var(--border-subtle)';
+                let textColor = 'var(--text-primary)';
+
+                if (showResult) {
+                  if (isCorrect) {
+                    bg = 'rgba(72,187,120,0.15)';
+                    borderColor = '#48bb78';
+                    textColor = '#48bb78';
+                  } else if (isSelected && !isCorrect) {
+                    bg = 'rgba(245,101,101,0.15)';
+                    borderColor = '#f56565';
+                    textColor = '#f56565';
+                  }
+                }
+
+                return (
+                  <button key={letter} onClick={() => handleEMQAnswer(letter)} disabled={emqAnswer !== null} style={{
+                    background: bg, border: `2px solid ${borderColor}`,
+                    borderRadius: 12, padding: '14px 8px', cursor: emqAnswer ? 'default' : 'pointer',
+                    fontWeight: 800, fontSize: 18, color: textColor,
+                    transition: 'all 0.3s ease', fontFamily: 'var(--font-sans)',
+                    opacity: showResult && !isCorrect && !isSelected ? 0.4 : 1,
+                  }}
+                  onMouseEnter={e => { if (!emqAnswer) { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.borderColor = '#48bb78'; }}}
+                  onMouseLeave={e => { if (!emqAnswer) { e.currentTarget.style.transform = ''; e.currentTarget.style.borderColor = 'var(--border-subtle)'; }}}
+                  >{letter}</button>
+                );
+              })}
+            </div>
+
+            {/* Explanation */}
+            {emqAnswer && (
+              <div className="animate-fadeInUp" style={{
+                background: emqAnswer === currentStem.correctAnswer
+                  ? 'rgba(72,187,120,0.08)' : 'rgba(245,101,101,0.08)',
+                border: `1px solid ${emqAnswer === currentStem.correctAnswer ? 'rgba(72,187,120,0.25)' : 'rgba(245,101,101,0.25)'}`,
+                borderRadius: 16, padding: '20px 24px', marginBottom: 20,
+              }}>
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10,
+                  fontSize: 14, fontWeight: 700,
+                  color: emqAnswer === currentStem.correctAnswer ? '#48bb78' : '#f56565',
+                }}>
+                  {emqAnswer === currentStem.correctAnswer ? '✅ Correct!' : `❌ Incorrect — Answer: ${currentStem.correctAnswer}`}
+                </div>
+                <p style={{ margin: 0, fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.7 }}>
+                  {currentStem.explanation}
+                </p>
+              </div>
+            )}
+
+            {/* Next Button */}
+            {emqAnswer && (
+              <div style={{ display: 'flex', justifyContent: 'center' }}>
+                <button onClick={nextEMQStem} style={{
+                  background: 'linear-gradient(135deg, #48bb78, #38a169)',
+                  color: '#fff', border: 'none', borderRadius: 14,
+                  padding: '14px 44px', fontWeight: 700, fontSize: 15,
+                  cursor: 'pointer', transition: 'all 0.3s ease',
+                  boxShadow: '0 4px 20px rgba(72,187,120,0.3)',
+                }}
+                onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
+                onMouseLeave={e => e.currentTarget.style.transform = ''}
+                >
+                  {emqStemIdx + 1 < currentSet.stems.length
+                    ? 'Next Stem →'
+                    : emqSetIdx + 1 < GAME_DATA.emqSets.length
+                      ? 'Next Set →'
+                      : 'View Results 🏆'}
+                </button>
+              </div>
+            )}
+
+            <Footer />
           </div>
         </div>
       </>
