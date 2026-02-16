@@ -43,6 +43,19 @@ function Confetti({ active }) {
   );
 }
 
+/* ─── Brand Name (Blood🩸Doctor) ─── */
+function BrandName({ size = 'sm' }) {
+  const fs = size === 'lg' ? 16 : size === 'md' ? 14 : 13;
+  const dropFs = size === 'lg' ? 15 : size === 'md' ? 13 : 12;
+  return (
+    <span style={{ fontWeight: 800, letterSpacing: -0.3, fontSize: fs }}>
+      <span style={{ color: 'var(--text-primary)' }}>Blood</span>
+      <span style={{ color: '#e53e3e', fontSize: dropFs, verticalAlign: 'middle' }}>🩸</span>
+      <span style={{ color: 'var(--text-primary)' }}>Doctor</span>
+    </span>
+  );
+}
+
 /* ─── Navbar ─── */
 function Navbar({ onBack, showBack, rightContent, theme, onThemeToggle }) {
   return (
@@ -54,7 +67,7 @@ function Navbar({ onBack, showBack, rightContent, theme, onThemeToggle }) {
       borderBottom: '1px solid var(--border-subtle)',
       position: 'sticky', top: 0, zIndex: 50,
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         {showBack && (
           <button onClick={onBack} style={{
             background: 'none', border: 'none', color: 'var(--text-muted)',
@@ -70,14 +83,8 @@ function Navbar({ onBack, showBack, rightContent, theme, onThemeToggle }) {
             <span style={{ fontSize: 16 }}>&larr;</span> Menu
           </button>
         )}
-        <div style={{
-          width: 32, height: 32, borderRadius: 8,
-          background: 'linear-gradient(135deg, #e53e3e, #c53030)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 17, boxShadow: 'var(--logo-shadow)',
-        }}>🩸</div>
         <div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: -0.3 }}>Blood Doctor</div>
+          <BrandName />
           <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 500, letterSpacing: 0.3 }}>Lymphoma Challenge</div>
         </div>
       </div>
@@ -192,14 +199,8 @@ function Footer() {
       borderTop: '1px solid var(--border-subtle)',
       marginTop: 40,
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 6 }}>
-        <div style={{
-          width: 22, height: 22, borderRadius: 6,
-          background: 'linear-gradient(135deg, #e53e3e, #c53030)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 12,
-        }}>🩸</div>
-        <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-footer-name)' }}>Blood Doctor</span>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0, marginBottom: 6 }}>
+        <BrandName size="md" />
       </div>
       <div style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.7, maxWidth: 400, margin: '0 auto' }}>
         <strong style={{ color: 'var(--text-footer-name)' }}>Dr Abdul Mannan</strong> &middot; FRCPath &middot; FCPS
@@ -210,7 +211,7 @@ function Footer() {
         </a>
       </div>
       <div style={{ fontSize: 10, color: 'var(--text-dimmed)', marginTop: 8 }}>
-        Content sourced from ASH-SAP Chapter 45 &middot; For educational purposes only
+        For educational purposes only
       </div>
     </footer>
   );
@@ -360,14 +361,13 @@ export default function App() {
           <div style={{ maxWidth: 780, margin: '0 auto', padding: '40px 20px' }}>
             {/* Hero */}
             <div className="animate-fadeInUp" style={{ textAlign: 'center', marginBottom: 56 }}>
-              <div style={{
-                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                width: 88, height: 88, borderRadius: 22,
-                background: 'linear-gradient(135deg, #e53e3e 0%, #c53030 100%)',
-                marginBottom: 24, fontSize: 44,
-                boxShadow: 'var(--hero-shadow)',
-                animation: 'glow-pulse 3s ease infinite',
-              }}>🩸</div>
+              <div style={{ marginBottom: 20 }}>
+                <span style={{ fontSize: 'clamp(32px, 6vw, 48px)', fontWeight: 900, letterSpacing: -0.5 }}>
+                  <span style={{ color: 'var(--text-primary)' }}>Blood</span>
+                  <span style={{ color: '#e53e3e', fontSize: 'clamp(30px, 5.5vw, 44px)', verticalAlign: 'middle', filter: 'drop-shadow(0 2px 8px rgba(229,62,62,0.3))' }}>🩸</span>
+                  <span style={{ color: 'var(--text-primary)' }}>Doctor</span>
+                </span>
+              </div>
               <h1 style={{
                 fontSize: 'clamp(28px, 5vw, 40px)', fontWeight: 900, margin: '0 0 10px',
                 background: 'linear-gradient(135deg, #fc8181 0%, #f6ad55 40%, #68d391 100%)',
@@ -381,7 +381,7 @@ export default function App() {
                 FRCPath / FCPS Board Review &mdash; Interactive Case-Based Learning
               </p>
               <p style={{ color: 'var(--text-muted)', fontSize: 12, marginTop: 6, fontStyle: 'italic' }}>
-                By Dr Abdul Mannan &middot; Blood Doctor Educational Series
+                By Dr Abdul Mannan
               </p>
             </div>
 
@@ -497,18 +497,6 @@ export default function App() {
                   <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600, letterSpacing: 0.5, textTransform: 'uppercase', marginTop: 2 }}>{s.label}</div>
                 </div>
               ))}
-            </div>
-
-            {/* Source disclaimer */}
-            <div className="animate-fadeInUp stagger-5" style={{
-              padding: '16px 20px', borderRadius: 12,
-              background: 'var(--bg-subtle)',
-              border: '1px solid var(--border-subtle)',
-            }}>
-              <p style={{ margin: 0, color: 'var(--text-dimmed)', fontSize: 11, textAlign: 'center', lineHeight: 1.7 }}>
-                Content sourced from ASH-SAP Chapter 45 — Aggressive Non-Hodgkin and Burkitt Lymphomas.
-                Covers DLBCL, PMBCL, Burkitt, DHL, CNS lymphoma, MCL, PTLD, and HIV-associated lymphomas.
-              </p>
             </div>
 
             <Footer />
